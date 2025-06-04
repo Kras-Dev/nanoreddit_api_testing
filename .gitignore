@@ -1,0 +1,22 @@
+.venv/
+.env/
+allure-results/
+allure-reports/
+
+.env
+
+
+# Игнорировать папки __pycache__
+__pycache__/
+.pytest_cache/
+
+# Игнорировать временные файлы и каталоги PyCharm
+.idea/
+*.iml
+*.pyc
+*.pyo
+*.pyd
+
+struct.txt
+cheat_sheet.txt
+main.py

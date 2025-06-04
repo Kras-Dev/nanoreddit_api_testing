@@ -1,0 +1,17 @@
+class ApiEndpoints:
+    """
+    Класс, содержащий базовый URL и пути к основным API-эндпоинтам сервера.
+    """
+    BASE_URL = "http://localhost:8080"
+    AUTH_REGISTER = "/api/v1/auth/register"
+    AUTH_LOGIN = "/api/v1/auth/login"
+    POSTS = "/api/v1/posts"
+    POST = "/api/v1/posts/{post_id}"
+    POST_VOTE = "/api/v1/posts/{post_id}/vote"
+    POST_ADD_COMMENT = "/api/v1/posts/{post_id}/addComment"
+    POST_PUBLISH = "/api/v1/posts/publish"
+    PROFILE_INFO = "/api/v1/profile/info"
+    ADMIN_PROFILE_INFO = "/api/v1/admin/user/{user_id}"
+    ADMIN_BAN_USER = "/api/v1/admin/management/ban/byEmail/{email}"
+    ADMIN_UNBAN_USER = "/api/v1/admin/management/unban/byEmail/{email}"
+    COMMENT_REPLY = "/api/v1/comments/{parentCommentId}/reply"
