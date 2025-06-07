@@ -1,8 +1,8 @@
 from typing import Optional
 
-from sqlalchemy import create_engine, Engine
+from sqlalchemy import Engine, create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from src.config.db_config import DataBaseConfig
 from src.utils.custom_logger import CustomLogger

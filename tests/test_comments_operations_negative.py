@@ -12,7 +12,7 @@ fake = Faker()
 @pytest.mark.negative
 class TestCommentsNegative:
     @allure.title("Ответ на комментарий с несуществующим ID родителя")
-    def test_comment_reply_invalid_id(self, user, comments_service):
+    def test_comment_reply_invalid_id(self, user, comments_controller):
         """
         Тест попытки ответить на комментарий с несуществующим parent_comment_id
         """
@@ -22,7 +22,7 @@ class TestCommentsNegative:
         }
         with allure.step("Отправка запроса на ответ на комментарий с несуществующим ID родителя"):
             try:
-                response = comments_service.reply_to_comment(**test_data)
+                response = comments_controller.reply_to_comment(**test_data)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при ответе на комментарий с несуществующим ID родителя: {e}")

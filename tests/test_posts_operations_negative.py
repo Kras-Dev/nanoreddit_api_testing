@@ -12,14 +12,14 @@ fake = Faker()
 @pytest.mark.negative
 class TestPostsNegative:
     @allure.title("Получение поста без авторизации")
-    def test_get_post_no_auth(self, posts_service):
+    def test_get_post_no_auth(self, posts_controller):
         """
         Тест получения информации о посте без авторизации
         """
         post_id = str(fake.uuid4())
         with allure.step("Отправка запроса на получение информации о посте"):
             try:
-                response = posts_service.get_post(post_id)
+                response = posts_controller.get_post(post_id)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при получении информации о посте: {e}")
@@ -34,14 +34,14 @@ class TestPostsNegative:
             assert validation_response.error == "Access denied", "Ожидалось сообщение об ошибке 'Access denied'"
 
     @allure.title("Получение поста с несуществующим ID")
-    def test_get_post_invalid_id(self, posts_service, user):
+    def test_get_post_invalid_id(self, posts_controller, user):
         """
         Тест получения поста с несуществующим ID.
         """
         post_id = fake.uuid4()
         with allure.step("Отправка запроса на получение информации о посте"):
             try:
-                response = posts_service.get_post(post_id)
+                response = posts_controller.get_post(post_id)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при получении информации о посте: {e}")
@@ -56,14 +56,14 @@ class TestPostsNegative:
         assert validation_response.error == "Post not found", "Ожидалось сообщение об ошибке 'Post not found'"
 
     @allure.title("Добавление комментария к несуществующему посту")
-    def test_add_comment_invalid_post_id(self, posts_service, user):
+    def test_add_comment_invalid_post_id(self, posts_controller, user):
         """
         Тест добавления комментария к посту с несуществующим ID.
         """
         test_data = {"post_id": fake.uuid4(), "comment_text": fake.text(12)}
         with allure.step("Отправка запроса на публикацию комментария"):
             try:
-                response = posts_service.add_comment(**test_data)
+                response = posts_controller.add_comment(**test_data)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при добавлении комментария: {e}")
@@ -78,14 +78,14 @@ class TestPostsNegative:
             assert validation_response.error == "Post not found", "Ожидалось сообщение об ошибке 'Post not found'"
 
     @allure.title("Голосование за пост с несуществующим ID")
-    def test_vote_post_invalid_id(self, posts_service, user):
+    def test_vote_post_invalid_id(self, posts_controller, user):
         """
         Тест голосования за пост с несуществующим ID.
         """
         test_data = {"post_id": fake.uuid4(), "value": 1}
         with allure.step("Отправка запроса на голосование за пост"):
             try:
-                response = posts_service.vote_post(**test_data)
+                response = posts_controller.vote_post(**test_data)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при голосовании за пост: {e}")

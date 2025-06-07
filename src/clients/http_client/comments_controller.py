@@ -7,7 +7,7 @@ from src.config.api_endpoints import ApiEndpoints
 from src.models.api_model import NewCommentRequest
 
 
-class CommentsService:
+class CommentsController:
     def __init__(self, base_client: BaseClient):
         """
         Клиент для работы с комментариями через API.

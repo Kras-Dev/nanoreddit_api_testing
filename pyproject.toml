@@ -1,0 +1,39 @@
+[project]
+name = "nanoreddit-api-testing"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "email-validator>=2.2.0",
+    "psycopg2>=2.9.10",
+    "pydantic>=2.11.4",
+    "python-dotenv>=1.1.0",
+    "requests>=2.32.3",
+    "sqlalchemy>=2.0.41",
+]
+
+[dependency-groups]
+dev = [
+    "allure-pytest>=2.14.2",
+    "faker>=37.3.0",
+    "pytest>=8.3.5",
+    "pytest-xdist>=3.6.1",
+    "ruff>=0.11.13",
+]
+
+[tool.ruff]
+# Максимальная длина строки кода — 99 символов
+line-length = 99
+# Перечислены коды ошибок, которые ruff может автоматически исправлять при запуске с --fix
+fixable = ["E501", "I001", "D212", "D200"]
+
+[tool.ruff.lint]
+# Выбираются группы ошибок для проверки:
+# E — ошибки стиля (PEP8),
+# F — ошибки фреймворка (например, flake8),
+# I — ошибки, связанные с импортами,
+# C90 — дополнительные правила
+select = ["E", "F", "I", "C90", "T", "D"]
+
+[tool.ruff.lint.per-file-ignores]
+# В файлах __init__.py игнорируется предупреждение F401 (неиспользуемый импорт),
+"__init__.py" = ["F401"]

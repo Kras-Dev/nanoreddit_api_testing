@@ -9,6 +9,7 @@ allure-reports/
 # Игнорировать папки __pycache__
 __pycache__/
 .pytest_cache/
+.ruff_cache/
 
 # Игнорировать временные файлы и каталоги PyCharm
 .idea/
@@ -20,3 +21,4 @@ __pycache__/
 struct.txt
 cheat_sheet.txt
 main.py
+todo.txt

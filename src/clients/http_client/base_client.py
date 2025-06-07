@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 import requests
 
@@ -45,6 +45,7 @@ class BaseClient:
         """
         url = self._url(path)
         response = self.session.post(url, json=json, params=params)
+
         return response
 
     def get_request(self, path: str, params: Optional[Dict[str, Any]] = None) -> requests.Response:

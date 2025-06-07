@@ -1,5 +1,6 @@
-import logging
 import inspect
+import logging
+
 
 class CustomLogger:
     def __init__(self, name:str) -> None:

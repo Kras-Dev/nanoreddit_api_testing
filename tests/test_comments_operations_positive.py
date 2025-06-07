@@ -12,14 +12,14 @@ fake = Faker()
 @allure.story("Comment Operations Positive")
 @pytest.mark.positive
 class TestComments:
-    def test_comment_reply(self, user, publish_post, add_comment, comments_service, sql_client):
+    def test_comment_reply(self, user, publish_post, add_comment, comments_controller, sql_client):
         """
         Тест на добавление ответа (реплая) к существующему комментарию.
         """
         test_data = fake.text(10)
         with allure.step("Отправка запроса на публикацию ответа к комментарию"):
             try:
-                response = comments_service.reply_to_comment(add_comment, test_data)
+                response = comments_controller.reply_to_comment(add_comment, test_data)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при публикации комментария: {e}")

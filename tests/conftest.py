@@ -1,19 +1,20 @@
-from typing import Dict, Any
+from dataclasses import dataclass
+from typing import Any, Dict
 
 import pytest
 from faker import Faker
 from pydantic import ValidationError
 
-from src.clients.http_client.admin_controller import AdminService
-from src.clients.http_client.auth_controller import AuthService
+from src.clients.http_client.admin_controller import AdminController
+from src.clients.http_client.auth_controller import AuthController
 from src.clients.http_client.base_client import BaseClient
-from src.clients.http_client.comments_controller import CommentsService
-from src.clients.http_client.post_controller import PostsService
-from src.clients.http_client.profile_controller import ProfileService
+from src.clients.http_client.comments_controller import CommentsController
+from src.clients.http_client.post_controller import PostsController
+from src.clients.http_client.profile_controller import ProfileController
 from src.clients.sql_client.sqlalchemy_client import SqlAlchemyClient
-from src.models.api_model import ApiResponse, PublishRequest, PostPublishResponse
-
+from src.models.api_model import ApiResponse, PostPublishResponse, PublishRequest
 from src.utils.custom_logger import CustomLogger
+
 custom_logger = CustomLogger(__name__)
 fake = Faker()
 
@@ -34,15 +35,38 @@ def http_client():
     yield http_client
     http_client.close_session()
 
-@pytest.fixture(scope="module")
-def profile_service(http_client):
-    """Создает клиент профиля."""
-    return ProfileService(http_client)
+@dataclass
+class Clients:
+    db: SqlAlchemyClient
+    http: BaseClient
+    profile: ProfileController
+    auth: AuthController
+    posts: PostsController
+    comments: CommentsController
+    admin: AdminController
 
 @pytest.fixture(scope="module")
-def auth_service(http_client):
+def clients(http_client, sql_client, profile_controller, auth_controller, posts_controller, comments_controller,
+            admin_controller):
+    return Clients(
+        db=sql_client,
+        http=http_client,
+        profile=profile_controller,
+        auth=auth_controller,
+        posts=posts_controller,
+        comments=comments_controller,
+        admin=admin_controller
+    )
+
+@pytest.fixture(scope="module")
+def profile_controller(http_client):
+    """Создает клиент профиля."""
+    return ProfileController(http_client)
+
+@pytest.fixture(scope="module")
+def auth_controller(http_client):
     """Создает клиент аутентификации."""
-    return AuthService(http_client)
+    return AuthController(http_client)
 
 def register_user(auth_client, sql_client) -> Dict[str, Any]:
     """Регистрирует пользователя и проверяет его в базе, возвращает данные и пароль."""
@@ -97,10 +121,10 @@ def login_user(auth_client, email: str, password: str) -> str:
     return validated_login.responseData["jwt"]
 
 @pytest.fixture(scope="module")
-def user(auth_service, sql_client):
+def user(auth_controller, sql_client):
     """Создает пользователя и осуществляет вход."""
-    user_data = register_user(auth_service, sql_client)
-    token = login_user(auth_service, user_data["email"], user_data["password"])
+    user_data = register_user(auth_controller, sql_client)
+    token = login_user(auth_controller, user_data["email"], user_data["password"])
     user_data["token"] = token
 
     yield user_data
@@ -114,13 +138,13 @@ def user_auth_token(http_client, user):
     http_client.clear_token()
 
 @pytest.fixture(scope="module")
-def admin_user(auth_service, sql_client):
+def admin_user(auth_controller, sql_client):
     """Создает администратора и осуществляет вход."""
-    user_data = register_user(auth_service, sql_client)
+    user_data = register_user(auth_controller, sql_client)
     sql_client.set_admin_role(user_data["user_id"])
     user = sql_client.get_user_by_email(user_data["email"])
     assert user.role == "ADMIN", f"Ожидалась роль ADMIN, но получена {user.role}"
-    token = login_user(auth_service, user_data["email"], user_data["password"])
+    token = login_user(auth_controller, user_data["email"], user_data["password"])
     user_data["token"] = token
 
     yield user_data
@@ -134,17 +158,17 @@ def admin_auth_token(http_client, admin_user):
     http_client.clear_token()
 
 @pytest.fixture(scope="module")
-def admin_service(http_client):
+def admin_controller(http_client):
     """Создает клиент администратора (токен устанавливается через фикстуру admin_auth_token)."""
-    yield AdminService(http_client)
+    yield AdminController(http_client)
 
 @pytest.fixture(scope="module")
-def posts_service(http_client):
+def posts_controller(http_client):
     """Создает клиент постов."""
-    return PostsService(http_client)
+    return PostsController(http_client)
 
 @pytest.fixture(scope="class")
-def publish_post(user, sql_client, posts_service):
+def publish_post(user, sql_client, posts_controller):
     """Создает пост от имени авторизованного пользователя."""
     test_data = {
         "title": fake.text(10),
@@ -152,7 +176,7 @@ def publish_post(user, sql_client, posts_service):
     }
     response = None
     try:
-        response = posts_service.publish_post(PublishRequest.model_validate(test_data).model_dump())
+        response = posts_controller.publish_post(PublishRequest.model_validate(test_data).model_dump())
         response.raise_for_status()
     except Exception as e:
         pytest.fail(f"Ошибка при создании поста {e}")
@@ -170,16 +194,16 @@ def publish_post(user, sql_client, posts_service):
     yield str(post_id)
 
 @pytest.fixture(scope="module")
-def comments_service(http_client):
+def comments_controller(http_client):
     """Создает клиент комментариев."""
-    return CommentsService(http_client)
+    return CommentsController(http_client)
 
 @pytest.fixture(scope="class")
-def add_comment(user, publish_post, sql_client, posts_service):
+def add_comment(user, publish_post, sql_client, posts_controller):
     """Создает комментарий к посту от имени авторизованного пользователя."""
     test_data = fake.text(15)
     try:
-        response = posts_service.add_comment(publish_post, test_data)
+        response = posts_controller.add_comment(publish_post, test_data)
         response.raise_for_status()
     except Exception as e:
         pytest.fail(f"Ошибка при создании комментария {e}")

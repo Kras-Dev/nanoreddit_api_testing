@@ -1,12 +1,12 @@
 import requests
 
 from src.clients.http_client.base_client import BaseClient
-from src.clients.http_client.profile_controller import ProfileService
+from src.clients.http_client.profile_controller import ProfileController
 from src.config.api_endpoints import ApiEndpoints
 from src.models.api_model import ProfileResponse
 
 
-class AdminService:
+class AdminController:
     """
     Клиент для работы с админскими операциями через API.
     """
@@ -17,6 +17,7 @@ class AdminService:
         """
         Получить профиль пользователя по ID.
         """
+        self._check_admin()
         endpoint = ApiEndpoints.ADMIN_PROFILE_INFO.format(user_id=str(user_id))
         response = self.api.post_request(endpoint)
         return response
@@ -45,7 +46,7 @@ class AdminService:
         """
         Проверить роль ADMIN.
         """
-        profile_client = ProfileService(self.api)
+        profile_client = ProfileController(self.api)
         response = profile_client.get_profile_info().json()
         profile_response = ProfileResponse.model_validate(response)
         if not profile_response.responseData or "ROLE_ADMIN" not in profile_response.responseData.authorities:

@@ -22,14 +22,14 @@ def test_data():
 @pytest.mark.positive
 class TestAuth:
     @allure.title("Успешная регистрация")
-    def test_register_user(self, auth_service, sql_client, test_data):
+    def test_register_user(self, auth_controller, sql_client, test_data):
         """
         Тест регистрации нового пользователя.
         Проверяет успешный ответ API и наличие пользователя в базе.
         """
         with allure.step("Отправка запроса на регистрацию пользователя"):
             try:
-                response = auth_service.register(test_data)
+                response = auth_controller.register(test_data)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при регистрации пользователя: {e}")
@@ -47,7 +47,7 @@ class TestAuth:
                 "Пользователь не найден в базе после регистрации"
 
     @allure.title("Успешная авторизация")
-    def test_auth_user(self, auth_service, test_data):
+    def test_auth_user(self, auth_controller, test_data):
         """
         Тест авторизации существующего пользователя.
         Проверяет успешный ответ API и наличие JWT токена в ответе.
@@ -58,7 +58,7 @@ class TestAuth:
         }
         with allure.step("Отправка запроса на авторизацию пользователя"):
             try:
-                response = auth_service.login(auth_data)
+                response = auth_controller.login(auth_data)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при авторизации пользователя: {e}")

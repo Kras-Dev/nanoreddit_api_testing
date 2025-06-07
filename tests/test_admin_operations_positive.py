@@ -4,18 +4,19 @@ from pydantic import ValidationError
 
 from src.models.api_model import AdminUserResponse, BanUserResponse, UnbanUserResponse
 
+
 @allure.feature("Admin Controller")
 @allure.story("Admin Operations Positive")
 @pytest.mark.positive
 class TestAdmin:
     @allure.title("Получение информации о пользователе по ID")
-    def test_get_user_profile(self, admin_user, admin_auth_token, user, admin_service, sql_client):
+    def test_get_user_profile(self, admin_user, admin_auth_token, user, admin_controller, sql_client):
         """
         Тест получения информации о пользователе по ID с правами администратора.
         """
         with allure.step("Отправка запроса на получение информации о пользователе по ID (для админа)"):
             try:
-                response = admin_service.get_user_profile(user.get("user_id"))
+                response = admin_controller.get_user_profile(user.get("user_id"))
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при получении информации о пользователе: {e}")
@@ -31,13 +32,13 @@ class TestAdmin:
                 "ID пользователя в ответе не совпадает с ожидаемым"
 
     @allure.title("Бан пользователя по email")
-    def test_ban_user_by_email(self, admin_user, admin_auth_token, user, admin_service, sql_client):
+    def test_ban_user_by_email(self, admin_user, admin_auth_token, user, admin_controller, sql_client):
         """
         Тест блокировки пользователя по email с правами администратора.
         """
         with allure.step("Отправка запроса на бан пользователя по email"):
             try:
-                response = admin_service.ban_user(user.get("email"), 40)
+                response = admin_controller.ban_user(user.get("email"), 40)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при бане пользователя по email: {e}")
@@ -56,13 +57,13 @@ class TestAdmin:
 
 
     @allure.title("Разбан пользователя по email")
-    def test_unban_user_by_email(self, admin_user, user, admin_auth_token, admin_service, sql_client):
+    def test_unban_user_by_email(self, clients, admin_user, user, admin_auth_token):
         """
         Тест разблокировки пользователя по email с правами администратора.
         """
         with allure.step("Отправка запроса на разбан пользователя по email"):
             try:
-                response = admin_service.unban_user(user.get("email"))
+                response = clients.admin.unban_user(user.get("email"))
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при разбане пользователя по email: {e}")

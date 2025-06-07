@@ -1,10 +1,28 @@
-from typing import Literal, Optional, List, Any
-from uuid import UUID
 from datetime import datetime
+from typing import Any, List, Literal, Optional
+from uuid import UUID
+
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
+
+def validate_password_complexity(password: str) -> str:
+    """
+    Проверяет сложность пароля на соответствие требованиям.
+    """
+    if len(password) < 8:
+        raise ValueError("Password must be at least 8 characters long")
+    if not any(ch.isdigit() for ch in password):
+        raise ValueError("Password must contain at least one digit")
+    if not any(ch.islower() for ch in password):
+        raise ValueError("Password must contain at least one lowercase letter")
+    if not any(ch.isupper() for ch in password):
+        raise ValueError("Password must contain at least one uppercase letter")
+    if any(ch.isspace() for ch in password):
+        raise ValueError("Password must not contain whitespace")
+    return password
+
 class ApiResponse(BaseModel):
-    """Базовая модель ответа API"""
+    """Базовая модель ответа API."""
     status: Literal["ok", "error"] = Field(..., description="Response status")
     error: Optional[str] = Field(None, description="Error message if status is 'error'")
     responseData: Optional[Any] = Field(None, description="Response data payload")
@@ -24,18 +42,8 @@ class RegistrationRequest(BaseModel):
 
     @field_validator("password", mode="after")
     @classmethod
-    def  password_complexity(cls, password:str) -> str:
-        if len(password) < 8:
-            raise ValueError("Password must be at least 8 characters long")
-        if not any(ch.isdigit() for ch in password):
-            raise ValueError("Password must contain at least one digit")
-        if not any(ch.islower() for ch in password):
-            raise ValueError("Password must contain at least one lowercase letter")
-        if not any(ch.isupper() for ch in password):
-            raise ValueError("Password must contain at least one uppercase letter")
-        if any(ch.isspace() for ch in password):
-            raise ValueError("Password must not contain whitespace")
-        return password
+    def password_complexity(cls, password:str) -> str:
+        return validate_password_complexity(password)
 
     @field_validator( "passwordConfirmation", mode="after")
     @classmethod
@@ -56,17 +64,7 @@ class LoginRequest(BaseModel):
     @field_validator("password", mode="after")
     @classmethod
     def password_complexity(cls, password: str) -> str:
-        if len(password) < 8:
-            raise ValueError("Password must be at least 8 characters long")
-        if not any(ch.isdigit() for ch in password):
-            raise ValueError("Password must contain at least one digit")
-        if not any(ch.islower() for ch in password):
-            raise ValueError("Password must contain at least one lowercase letter")
-        if not any(ch.isupper() for ch in password):
-            raise ValueError("Password must contain at least one uppercase letter")
-        if any(ch.isspace() for ch in password):
-            raise ValueError("Password must not contain whitespace")
-        return password
+        return validate_password_complexity(password)
 
 class ProfileDataComponent(BaseModel):
     """

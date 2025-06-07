@@ -1,8 +1,10 @@
-from typing import Optional, Callable, Any
+from typing import Any, Callable, Optional
+
+import allure
 from sqlalchemy import text
-from src.models.sqlalchemy_model import Base, Post, Comment, Vote
+
 from src.clients.sql_client.sqlalchemy_connection import SQLAlchemyConnection
-from src.models.sqlalchemy_model import User
+from src.models.sqlalchemy_model import Base, Comment, Post, User, Vote
 from src.utils.custom_logger import CustomLogger
 
 custom_logger = CustomLogger(__name__)
@@ -30,10 +32,8 @@ class SqlAlchemyClient:
             custom_logger.log_with_context(f"Ошибка при работе с базой: {e}")
             return None
 
+    @allure.step("Установить роль ADMIN пользователю по user_id.")
     def set_admin_role(self, user_id: int) -> bool:
-        """
-        Установить роль ADMIN пользователю по user_id.
-        """
         def operation(session):
             user = session.query(User).filter_by(id=user_id).one_or_none()
             if not user:
@@ -44,10 +44,8 @@ class SqlAlchemyClient:
         result = self._execute_db_operation(operation)
         return bool(result)
 
+    @allure.step("Удалить пользователя по user_id.")
     def delete_user(self, user_id: int) -> bool:
-        """
-        Удалить пользователя по user_id.
-        """
         def operation(session):
             user = session.query(User).filter_by(id=user_id).one_or_none()
             if not user:

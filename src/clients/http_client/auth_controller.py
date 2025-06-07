@@ -5,19 +5,19 @@ from src.clients.http_client.base_client import BaseClient
 from src.models.api_model import RegistrationRequest, LoginRequest, ApiResponse
 
 
-class AuthService:
+class AuthController:
     """
     Клиент для работы с регистрацией и авторизацией через API.
     """
     def __init__(self, base_client: BaseClient) -> None:
         self.api = base_client
 
-    def register(self, data: dict) ->requests.Response:
+    def register(self, data: dict, status_code=200) ->requests.Response:
         """
         Регистрация нового пользователя с валидацией данных через Pydantic.
         """
         data = RegistrationRequest.model_validate(data)
-        response = self.api.post_request(ApiEndpoints.AUTH_REGISTER, json=data.model_dump())
+        response = self.api.post_request(ApiEndpoints.AUTH_REGISTER, json=data.model_dump(), status_code)
         return response
 
     def login(self, data: dict) -> requests.Response:

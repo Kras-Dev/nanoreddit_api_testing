@@ -3,7 +3,13 @@ import pytest
 from faker import Faker
 from pydantic import ValidationError
 
-from src.models.api_model import PublishRequest, PostPublishResponse, ApiResponse, PostDataResponse, PostsResponse
+from src.models.api_model import (
+    ApiResponse,
+    PostDataResponse,
+    PostPublishResponse,
+    PostsResponse,
+    PublishRequest,
+)
 
 fake = Faker()
 
@@ -12,7 +18,7 @@ fake = Faker()
 @pytest.mark.positive
 class TestPosts:
     @allure.title("Публикация нового поста")
-    def test_publish_post(self, user, sql_client, posts_service):
+    def test_publish_post(self, user, sql_client, posts_controller):
         """
         Тест на публикацию нового поста и проверку его создания в базе.
         """
@@ -25,7 +31,7 @@ class TestPosts:
 
         with allure.step("Отправка запроса на публикацию поста"):
             try:
-                response = posts_service.publish_post(test_data)
+                response = posts_controller.publish_post(test_data)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при публикации поста: {e}")
@@ -47,14 +53,14 @@ class TestPosts:
             assert db_post.id == validation_response.responseData.id, "ID поста в базе не совпадает с ответом API"
 
     @allure.title("Добавление комментария к посту")
-    def test_add_comment(self, publish_post, posts_service, sql_client):
+    def test_add_comment(self, publish_post, posts_controller, sql_client):
         """
         Тест на добавление комментария к существующему посту и проверку его сохранения в базе.
         """
         test_data = fake.text(25)
         with allure.step("Отправка запроса на публикацию комментария"):
             try:
-                response = posts_service.add_comment(publish_post, test_data)
+                response = posts_controller.add_comment(publish_post, test_data)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при добавлении комментария: {e}")
@@ -73,13 +79,13 @@ class TestPosts:
             assert db_comment.text == test_data, "Текст комментария в базе не совпадает с тестовым"
 
     @allure.title("Голосование за пост")
-    def test_vote_post(self, posts_service, publish_post, sql_client):
+    def test_vote_post(self, posts_controller, publish_post, sql_client):
         """
         Тест на голосование за пост и проверку результата в базе.
         """
         with allure.step("Отправка запроса голосования за пост"):
             try:
-                response = posts_service.vote_post(publish_post, 1)
+                response = posts_controller.vote_post(publish_post, 1)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при голосовании за пост: {e}")
@@ -98,13 +104,13 @@ class TestPosts:
             assert db_vote == 1, "Количество голосов в базе не совпадает с тестовым"
 
     @allure.title("Получение информации о посте")
-    def test_get_post_info(self, posts_service, publish_post, user, sql_client):
+    def test_get_post_info(self, posts_controller, publish_post, user, sql_client):
         """
         Тест на получение информации о посте и проверку данных в ответе и базе.
         """
         with allure.step("Отправка запроса на получение информации о посте"):
             try:
-                response = posts_service.get_post(publish_post)
+                response = posts_controller.get_post(publish_post)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при получении информации о посте: {e}")
@@ -126,13 +132,13 @@ class TestPosts:
             assert db_post is not None, "Пост не найден в базе"
 
     @allure.title("Получение списка постов")
-    def test_get_posts_list(self, posts_service, publish_post):
+    def test_get_posts_list(self, posts_controller, publish_post):
         """
         Тест на получение списка постов и проверку корректности ответа.
         """
         with allure.step("Отправка запроса на получение списка постов"):
             try:
-                response = posts_service.get_posts_list()
+                response = posts_controller.get_posts_list()
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при получении списка постов: {e}")

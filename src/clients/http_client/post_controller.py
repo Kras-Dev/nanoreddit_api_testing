@@ -1,13 +1,14 @@
-from typing import Literal, Optional, Dict, Any
+from typing import Any, Dict, Literal, Optional
+from uuid import UUID
 
 import requests
 
 from src.clients.http_client.base_client import BaseClient
-from src.models.api_model import PublishRequest, Pageable, NewCommentRequest
 from src.config.api_endpoints import ApiEndpoints
-from uuid import UUID
+from src.models.api_model import NewCommentRequest, Pageable, PublishRequest
 
-class PostsService:
+
+class PostsController:
     def __init__(self, base_client: BaseClient):
         """
         Клиент для работы с постами через API.

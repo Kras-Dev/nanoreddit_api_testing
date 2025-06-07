@@ -1,10 +1,10 @@
 import requests
 
-from src.config.api_endpoints import ApiEndpoints
 from src.clients.http_client.base_client import BaseClient
+from src.config.api_endpoints import ApiEndpoints
 
 
-class ProfileService:
+class ProfileController:
     """
     Клиент для работы с профилем через API.
     """

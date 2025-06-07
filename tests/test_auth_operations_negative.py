@@ -23,7 +23,7 @@ def test_data():
 @pytest.mark.negative
 class TestAuthNegative:
     @allure.title("Регистрация с несовпадающими паролями")
-    def test_register_password_mismatch(self, auth_service, test_data):
+    def test_register_password_mismatch(self, auth_controller, test_data):
         """
         Тест регистрации с несовпадающими паролями.
         """
@@ -41,7 +41,7 @@ class TestAuthNegative:
         fake.password(length=8, special_chars=True, digits=True, upper_case=True, lower_case=False),
         fake.bothify("??## ??##"),
     ])
-    def test_register_incorrect_password(self, auth_service, test_data, invalid_password):
+    def test_register_incorrect_password(self, auth_controller, test_data, invalid_password):
         """
         Тест регистрации с различными некорректными паролями.
         """
@@ -51,15 +51,15 @@ class TestAuthNegative:
             with pytest.raises(ValidationError, match=r"Password | least 8 characters "):
                 RegistrationRequest(**test_data)
 
-    allure.title("Регистрация с уже существующим email")
-    def test_register_email_exist(self, auth_service, user, test_data):
+    @allure.title("Регистрация с уже существующим email")
+    def test_register_email_exist(self, auth_controller, user, test_data):
         """
         Тест регистрации пользователя с email, который уже существует в системе.
         """
         test_data = {**test_data, "email": user.get("email")}
         with allure.step("Отправка запроса на регистрацию с уже зарегистрированным email"):
             try:
-                response = auth_service.register(test_data)
+                response = auth_controller.register(test_data)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при регистрации пользователя с уже зарегистрированным email: {e}")
@@ -76,12 +76,12 @@ class TestAuthNegative:
                 f"Ожидалось сообщение об ошибке 'Username or Email already in use!', получено '{validation_response.error}'"
 
     allure.title("Авторизация с некорректными данными")
-    def test_auth_invalid_credentials(self, auth_service, test_data):
+    def test_auth_invalid_credentials(self, auth_controller, test_data):
         """Тест авторизации с некорректными учетными данными."""
         test_data = {**test_data, "email": fake.email()}
         with allure.step("Отправка запроса авторизации с неверными данными"):
             try:
-                response = auth_service.login(test_data)
+                response = auth_controller.login(test_data)
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при попытке авторизации с некорректными данными: {e}")

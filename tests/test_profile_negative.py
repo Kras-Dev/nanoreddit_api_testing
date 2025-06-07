@@ -10,13 +10,13 @@ from src.models.api_model import ApiResponse
 @pytest.mark.negative
 class TestProfileNegative:
     @allure.title("Получение профиля без авторизации")
-    def test_get_profile_no_auth(self, profile_service):
+    def test_get_profile_no_auth(self, profile_controller):
         """
         Тест получение информации о профиле без авторизации.
         """
         with allure.step("Отправка запроса на получение информации о профиле без авторизации"):
             try:
-                response = profile_service.get_profile_info()
+                response = profile_controller.get_profile_info()
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при получении профиля без авторизации: {e}")

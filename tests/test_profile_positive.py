@@ -10,13 +10,13 @@ from src.models.api_model import ProfileResponse
 @pytest.mark.positive
 class TestProfile:
     @allure.title("Получение профиля пользователя")
-    def test_profile(self, user, profile_service, sql_client):
+    def test_profile(self, user, profile_controller, sql_client):
         """
         Тест на получение профиля текущего пользователя.
         """
         with allure.step("Отправка запроса на получение профиля пользователя"):
             try:
-                response = profile_service.get_profile_info()
+                response = profile_controller.get_profile_info()
                 response.raise_for_status()
             except Exception as e:
                 pytest.fail(f"Ошибка при получении профиля пользователя: {e}")

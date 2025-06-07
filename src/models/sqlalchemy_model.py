@@ -1,5 +1,14 @@
-from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
-from sqlalchemy import Column, Text, String, Integer, ForeignKey, BigInteger, Identity, CheckConstraint
+from sqlalchemy import (
+    BigInteger,
+    CheckConstraint,
+    Column,
+    ForeignKey,
+    Identity,
+    Integer,
+    String,
+    Text,
+)
+from sqlalchemy.dialects.postgresql import TIMESTAMP, UUID
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
