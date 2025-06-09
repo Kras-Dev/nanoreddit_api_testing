@@ -3,7 +3,7 @@ import pytest
 from faker import Faker
 from pydantic import ValidationError
 
-from src.models.api_model import ApiResponse, RegistrationRequest, LoginRequest
+from src.models.api_model import LoginRequest, RegistrationRequest
 
 fake = Faker()
 
@@ -25,8 +25,7 @@ def test_data():
 class TestAuthNegative:
     @allure.title("Регистрация с несовпадающими паролями")
     def test_register_password_mismatch(self, clients, test_data):
-        """Тест регистрации с несовпадающими паролями.
-        """
+        """Тест регистрации с несовпадающими паролями."""
         test_data = {**test_data, "passwordConfirmation": fake.password()}
 
         with pytest.raises(ValidationError) as exc_info:
@@ -42,8 +41,7 @@ class TestAuthNegative:
         fake.bothify("??## ??##"),
     ])
     def test_register_incorrect_password(self, clients, test_data, invalid_password):
-        """Тест регистрации с различными некорректными паролями.
-        """
+        """Тест регистрации с различными некорректными паролями."""
         test_data = {**test_data, "password": invalid_password, "passwordConfirmation": invalid_password}
 
         with pytest.raises(ValidationError, match=r"Password | least 8 characters "):
@@ -51,8 +49,7 @@ class TestAuthNegative:
 
     @allure.title("Регистрация с уже существующим email")
     def test_register_email_exist(self, clients, user, test_data):
-        """Тест регистрации пользователя с email, который уже существует в системе.
-        """
+        """Тест регистрации пользователя с email, который уже существует в системе."""
         test_data = {**test_data, "email": user.get("email")}
         reg_data = RegistrationRequest(**test_data)
 

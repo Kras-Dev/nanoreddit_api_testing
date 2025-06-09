@@ -1,12 +1,15 @@
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 class ApiEndpoints:
     """Класс, содержащий базовый URL и пути к основным API-эндпоинтам сервера.
+
     Загружает параметры из переменных окружения, определенных в `.env` файле.
     """
+
     BASE_URL = os.getenv("BASE_URL")
     AUTH_REGISTER = os.getenv("AUTH_REGISTER")
     AUTH_LOGIN = os.getenv("AUTH_LOGIN")

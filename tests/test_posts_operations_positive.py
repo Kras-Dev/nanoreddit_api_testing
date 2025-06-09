@@ -4,8 +4,6 @@ from faker import Faker
 
 from src.models.api_model import PublishRequest
 
-from tests.conftest import clients
-
 fake = Faker()
 
 @allure.feature("Post Controller")
@@ -15,8 +13,7 @@ fake = Faker()
 class TestPosts:
     @allure.title("Публикация нового поста")
     def test_publish_post(self, clients, user):
-        """Тест на публикацию нового поста и проверку его создания в базе.
-        """
+        """Тест на публикацию нового поста и проверку его создания в базе."""
         test_data = PublishRequest(title=fake.text(15), content=fake.text(25))
 
         validation_response = clients.posts.publish_post(test_data)
@@ -33,8 +30,7 @@ class TestPosts:
 
     @allure.title("Добавление комментария к посту")
     def test_add_comment(self, clients, publish_post):
-        """Тест на добавление комментария к существующему посту и проверку его сохранения в базе.
-        """
+        """Тест на добавление комментария к существующему посту и проверку его сохранения в базе."""
         test_data = fake.text(25)
 
         validation_response = clients.posts.add_comment(publish_post, test_data)
@@ -47,8 +43,7 @@ class TestPosts:
 
     @allure.title("Голосование за пост")
     def test_vote_post(self, clients, publish_post):
-        """Тест на голосование за пост и проверку результата в базе.
-        """
+        """Тест на голосование за пост и проверку результата в базе."""
         validation_response = clients.posts.vote_post(publish_post, 1)
 
         assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
@@ -60,8 +55,7 @@ class TestPosts:
 
     @allure.title("Получение информации о посте")
     def test_get_post_info(self, clients, user, publish_post):
-        """Тест на получение информации о посте и проверку данных в ответе и базе.
-        """
+        """Тест на получение информации о посте и проверку данных в ответе и базе."""
         validation_response = clients.posts.get_post(publish_post)
 
         assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
@@ -76,8 +70,7 @@ class TestPosts:
 
     @allure.title("Получение списка постов")
     def test_get_posts_list(self, clients, publish_post):
-        """Тест на получение списка постов и проверку корректности ответа.
-        """
+        """Тест на получение списка постов и проверку корректности ответа."""
         validation_response = clients.posts.get_posts_list()
 
         assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"

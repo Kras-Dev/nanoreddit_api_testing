@@ -2,12 +2,13 @@ import allure
 import pytest
 from faker import Faker
 
-from src.models.api_model import RegistrationRequest, LoginRequest
+from src.models.api_model import LoginRequest, RegistrationRequest
 
 fake = Faker()
 
 @pytest.fixture(scope="module")
 def test_data():
+    """Генерирует тестовые данные для регистрации и аутентификации пользователя."""
     password = fake.password(length=8, special_chars=True, digits=True, upper_case=True, lower_case=True)
     return {
         "email": fake.email(),
@@ -24,6 +25,7 @@ class TestAuth:
     @allure.title("Успешная регистрация")
     def test_register_user(self, clients, test_data):
         """Тест регистрации нового пользователя.
+
         Проверяет успешный ответ API и наличие пользователя в базе.
         """
         test_data = RegistrationRequest(**test_data)
@@ -38,6 +40,7 @@ class TestAuth:
     @allure.title("Успешная авторизация")
     def test_auth_user(self, clients, test_data):
         """Тест авторизации существующего пользователя.
+
         Проверяет успешный ответ API и наличие JWT токена в ответе.
         """
         test_data = LoginRequest(email=test_data["email"], password=test_data["password"])

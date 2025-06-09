@@ -1,6 +1,7 @@
 import allure
 import pytest
 
+
 @allure.feature("Admin Controller")
 @allure.story("Admin Operations Positive")
 @pytest.mark.positive
@@ -8,8 +9,7 @@ import pytest
 class TestAdmin:
     @allure.title("Получение информации о пользователе по ID")
     def test_get_user_profile(self, clients, admin_user, admin_auth_token, user):
-        """Тест получения информации о пользователе по ID с правами администратора.
-        """
+        """Тест получения информации о пользователе по ID с правами администратора."""
         validation_response = clients.admin.get_user_profile(user.get("user_id"))
 
         assert validation_response.status == "ok", "Статус ответа не 'ok'"
@@ -18,8 +18,7 @@ class TestAdmin:
 
     @allure.title("Бан пользователя по email")
     def test_ban_user_by_email(self, clients,admin_user, admin_auth_token, user):
-        """Тест блокировки пользователя по email с правами администратора.
-        """
+        """Тест блокировки пользователя по email с правами администратора."""
         validation_response = clients.admin.ban_user(user.get("email"), 40)
 
         assert validation_response.status == "ok", "Статус ответа не 'ok'"
@@ -31,8 +30,7 @@ class TestAdmin:
 
     @allure.title("Разбан пользователя по email")
     def test_unban_user_by_email(self, clients, admin_user, user, admin_auth_token):
-        """Тест разблокировки пользователя по email с правами администратора.
-        """
+        """Тест разблокировки пользователя по email с правами администратора."""
         validation_response = clients.admin.unban_user(user.get("email"))
 
         assert validation_response.status == "ok", "Статус ответа не 'ok'"

@@ -1,10 +1,6 @@
 import allure
 import pytest
 from faker import Faker
-from pydantic import ValidationError
-
-from src.models.api_model import CommentApiResponse
-from tests.conftest import sql_client
 
 fake = Faker()
 
@@ -14,8 +10,7 @@ fake = Faker()
 @pytest.mark.comments
 class TestComments:
     def test_comment_reply(self, clients, user, publish_post, add_comment):
-        """Тест на добавление ответа (реплая) к существующему комментарию.
-        """
+        """Тест на добавление ответа (реплая) к существующему комментарию."""
         test_data = fake.text(10)
         validation_response = clients.comments.reply_to_comment(add_comment, test_data)
 

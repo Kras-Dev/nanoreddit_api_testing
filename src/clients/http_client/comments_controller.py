@@ -1,20 +1,17 @@
 from uuid import UUID
 
-
 from src.clients.http_client.base_client import BaseClient
 from src.config.api_endpoints import ApiEndpoints
-from src.models.api_model import NewCommentRequest, CommentApiResponse
+from src.models.api_model import CommentApiResponse, NewCommentRequest
 
 
 class CommentsController:
     def __init__(self, base_client: BaseClient):
-        """Клиент для работы с комментариями через API.
-        """
+        """Клиент для работы с комментариями через API."""
         self.api = base_client
 
     def reply_to_comment(self, parent_comment_id: str, comment_text: str) -> CommentApiResponse:
-        """Отправляет ответ на комментарий с указанным parent_comment_id.
-        """
+        """Отправляет ответ на комментарий с указанным parent_comment_id."""
         try:
             UUID(parent_comment_id)
         except ValueError:

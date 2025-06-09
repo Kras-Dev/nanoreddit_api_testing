@@ -10,17 +10,16 @@ from src.utils.custom_logger import CustomLogger
 custom_logger = CustomLogger(__name__)
 
 class SqlAlchemyClient:
-    """ Клиент для взаимодействия с базой данных через SQLAlchemy."""
+    """Клиент для взаимодействия с базой данных через SQLAlchemy."""
+
     def __init__(self) -> None:
-        """Инициализация клиента с соединением с базой данных.
-        """
+        """Инициализация клиента с соединением с базой данных."""
         self.connection = SQLAlchemyConnection()
         self.connection.connect()
         self.metadata = Base.metadata
 
     def _execute_db_operation(self, operation: Callable[[Any], Any]) -> Optional[Any]:
-        """Универсальный метод для выполнения операций с базой данных.
-        """
+        """Универсальный метод для выполнения операций с базой данных."""
         try:
             with self.connection.get_session() as session:
                 result = operation(session)

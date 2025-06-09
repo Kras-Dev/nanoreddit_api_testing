@@ -14,6 +14,8 @@ from sqlalchemy.orm import declarative_base, relationship
 Base = declarative_base()
 
 class User(Base):
+    """Модель пользователя."""
+
     __tablename__ = "users"
     id = Column(BigInteger, Identity(always=True), primary_key=True, nullable=False)
     banned_until = Column(TIMESTAMP(timezone=True), nullable=True)
@@ -40,6 +42,8 @@ class User(Base):
     comments = relationship("Comment", back_populates="user")
 
 class Post(Base):
+    """Модель поста."""
+
     __tablename__ = "posts"
     id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
     content = Column(Text, nullable=True)
@@ -52,6 +56,8 @@ class Post(Base):
     comments = relationship("Comment", back_populates="post")
 
 class Comment(Base):
+    """Модель комментария."""
+
     __tablename__ = "comments"
     id = Column(UUID(as_uuid=True), primary_key=True, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=True)
@@ -76,6 +82,8 @@ class Comment(Base):
     parent = relationship("Comment", remote_side=[id], backref="children")
 
 class Vote(Base):
+    """Модель голоса за пост."""
+
     __tablename__ = "votes"
     post_id = Column(UUID(as_uuid=True), ForeignKey("posts.id"), primary_key=True)
     user_id = Column(BigInteger, ForeignKey("users.id"), nullable=False, primary_key=True)

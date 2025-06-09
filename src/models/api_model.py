@@ -6,8 +6,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 def validate_password_complexity(password: str) -> str:
-    """Проверяет сложность пароля на соответствие требованиям.
-    """
+    """Проверяет сложность пароля на соответствие требованиям."""
     if len(password) < 8:
         raise ValueError("Password must be at least 8 characters long")
     if not any(ch.isdigit() for ch in password):
@@ -22,6 +21,7 @@ def validate_password_complexity(password: str) -> str:
 
 class ApiResponse(BaseModel):
     """Базовая модель ответа API."""
+
     status: Literal["ok", "error"] = Field(..., description="Response status")
     error: Optional[str] = Field(None, description="Error message if status is 'error'")
     responseData: Optional[Any] = Field(None, description="Response data payload")
@@ -31,6 +31,7 @@ class RegistrationRequest(BaseModel):
 
     Используется в  POST /api/v1/auth/register.
     """
+
     email: EmailStr = Field(min_length=1, description="Email address - should be valid")
     username: str = Field(min_length=1, description="Username - should be non-empty")
     password: str = Field(min_length=8, description=("Password must be at least 8 characters long, contain at least one digit, "
@@ -57,6 +58,7 @@ class LoginRequest(BaseModel):
 
     Используется в POST /api/v1/auth/login.
     """
+
     email: EmailStr = Field(min_length=1, description="Email address is required")
     password: str = Field(min_length=8, description="Password is required")
 
@@ -73,6 +75,7 @@ class ProfileDataComponent(BaseModel):
     - /api/v1/profile/info
     - /api/v1/admin/user/{id}
     """
+
     id: int = Field(..., description="User ID")
     email: EmailStr = Field(..., description="User Email")
     username: str = Field(..., description="User Name")
@@ -84,6 +87,7 @@ class ProfileResponse(ApiResponse):
 
     Используется в POST /api/v1/profile/info.
     """
+
     responseData: Optional[ProfileDataComponent] = Field(None, description="Profile data or None")
     message: Optional[str] = Field(None, description="Additional message from the server")
 
@@ -92,6 +96,7 @@ class PublishRequest(BaseModel):
 
     Используется в POST /api/v1/posts/publish.
     """
+
     title: str = Field(..., min_length=1, max_length=255, description="Title is required, should be less than 255 characters")
     content: str = Field(..., min_length=1, description="Content is required")
 
@@ -100,6 +105,7 @@ class PostPublishComponent(BaseModel):
 
     Используется в ответах на POST /api/v1/posts/publish.
     """
+
     id: UUID = Field(..., description="Post id")
     title: str = Field(..., description="Post title")
     content: str = Field(..., description="Post content")
@@ -111,6 +117,7 @@ class PostPublishResponse(ApiResponse):
 
     Используется в POST /api/v1/posts/publish.
     """
+
     responseData: Optional[PostPublishComponent] = Field(None, description="Post data")
 
 class Pageable(BaseModel):
@@ -118,6 +125,7 @@ class Pageable(BaseModel):
 
     Используется в GET /api/v1/posts и других эндпоинтах с пагинацией.
     """
+
     page: int = Field(..., ge=0, description="Page number (starts with 0)")
     size: int = Field(..., ge=1, description="Number of elements on page")
     sort: Optional[List[str]] = Field(default_factory=list, description="Sort options asc|desc")
@@ -127,6 +135,7 @@ class NewCommentRequest(BaseModel):
 
     Используется в POST /api/v1/posts/{postId}/addComment.
     """
+
     text: str = Field(..., max_length=255, description="Comment")
 
 class CommentResponse(BaseModel):
@@ -134,6 +143,7 @@ class CommentResponse(BaseModel):
 
     Включает информацию о самом комментарии и вложенных ответах (реплаях).
     """
+
     id: UUID = Field(..., description="Post id")
     text: str = Field(..., description="Comment text")
     author: EmailStr = Field(..., description="Author email")
@@ -145,6 +155,7 @@ class CommentApiResponse(ApiResponse):
 
     Используется в POST /api/v1/comments/{parentCommentId}/reply.
     """
+
     responseData: Optional[CommentResponse] = Field(None, description="Data of the created comment")
 
 class PostDataComponent(BaseModel):
@@ -152,6 +163,7 @@ class PostDataComponent(BaseModel):
 
     Используется в ответах GET /api/v1/posts/{postId}.
     """
+
     post: PostPublishComponent = Field(..., description="Post data")
     comments: List[CommentResponse] = Field(default_factory=list, description="List of comments for the post")
     voteScore: int = Field(..., description="Total number of votes for the post")
@@ -162,6 +174,7 @@ class PostDataResponse(ApiResponse):
 
     Используется в ответах GET /api/v1/posts/{postId}.
     """
+
     responseData: Optional[PostDataComponent] = Field(None, description="Post data with comments and votes")
 
 class PostsPageDataComponent(BaseModel):
@@ -169,6 +182,7 @@ class PostsPageDataComponent(BaseModel):
 
     Используется в ответах GET /api/v1/posts.
     """
+
     content: List[PostPublishComponent] = Field(..., description="List of posts on the page")
     pageNumber: int = Field(..., ge=0, description="Current page number")
     pageSize: int = Field(..., ge=1, description="Page size")
@@ -180,6 +194,7 @@ class PostsResponse(ApiResponse):
 
     Используется в GET /api/v1/posts.
     """
+
     responseData: Optional[PostsPageDataComponent] = Field(None, description="Data with posts and pagination")
 
 class AdminUserResponse(ApiResponse):
@@ -187,6 +202,7 @@ class AdminUserResponse(ApiResponse):
 
     Используется в POST /api/v1/admin/user/{id}.
     """
+
     responseData: Optional[ProfileDataComponent] = Field(None, description="Profile data")
 
 class UnbanUserData(BaseModel):
@@ -194,6 +210,7 @@ class UnbanUserData(BaseModel):
 
     Используется в POST /api/v1/admin/management/unban/byEmail/{email}.
     """
+
     bannedUntil: Optional[datetime] = Field(None, description="Ban end date")
 
 class UnbanUserResponse(ApiResponse):
@@ -201,6 +218,7 @@ class UnbanUserResponse(ApiResponse):
 
     Используется в POST /api/v1/admin/management/unban/byEmail/{email}.
     """
+
     responseData: Optional[UnbanUserData] = Field(None, description="User unban data")
     message: Optional[str] = Field(None, description="Additional server message")
 
@@ -209,6 +227,7 @@ class BanUserData(BaseModel):
 
     Используется в POST /api/v1/admin/management/ban/byEmail/{email}.
     """
+
     bannedUntil: Optional[datetime] = Field(None, description="Ban end date")
 
 class BanUserResponse(ApiResponse):
@@ -216,6 +235,7 @@ class BanUserResponse(ApiResponse):
 
     Используется в POST /api/v1/admin/management/ban/byEmail/{email}.
     """
+
     responseData: Optional[BanUserData] = Field(None, description="User ban data")
     message: Optional[str] = Field(None, description="Additional server message")
 

@@ -1,5 +1,9 @@
 from dataclasses import dataclass
+
+import pytest
 from conftest_users import *
+from steps.post_steps import add_comment_step, publish_post_step
+
 from src.clients.http_client.admin_controller import AdminController
 from src.clients.http_client.auth_controller import AuthController
 from src.clients.http_client.base_client import BaseClient
@@ -7,7 +11,7 @@ from src.clients.http_client.comments_controller import CommentsController
 from src.clients.http_client.post_controller import PostsController
 from src.clients.http_client.profile_controller import ProfileController
 from src.clients.sql_client.sqlalchemy_client import SqlAlchemyClient
-from steps.post_steps import publish_post_step, add_comment_step
+
 
 @pytest.fixture(scope="session")
 def sql_client():
@@ -53,6 +57,8 @@ def comments_controller(http_client):
 
 @dataclass
 class Clients:
+    """Класс-обёртка, агрегирующий различные клиенты для взаимодействия с API и базой данных."""
+
     db: SqlAlchemyClient
     api: BaseClient
     profile: ProfileController
@@ -64,6 +70,10 @@ class Clients:
 @pytest.fixture(scope="module")
 def clients(http_client, sql_client, profile_controller, auth_controller, posts_controller, comments_controller,
             admin_controller):
+    """Фикстура для создания объекта Clients, объединяющего API и контроллеры базы данных.
+
+    Используется для взаимодействия с сервисами и базой данных в тестах.
+    """
     return Clients(
         db=sql_client,
         api=http_client,

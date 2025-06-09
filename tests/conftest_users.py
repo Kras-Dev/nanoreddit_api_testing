@@ -1,8 +1,9 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
 import pytest
 from faker import Faker
-from src.models.api_model import RegistrationRequest, LoginRequest
+
+from src.models.api_model import LoginRequest, RegistrationRequest
 
 fake = Faker()
 
@@ -31,7 +32,7 @@ def register_user(clients) -> Dict[str, Any]:
     }
 
 def login_user(clients, email: str, password: str) -> str:
-    """Выполняет логин пользователя"""
+    """Выполняет логин пользователя."""
     login_data = LoginRequest(email=email, password=password)
     validation_response = clients.auth.login(login_data)
 

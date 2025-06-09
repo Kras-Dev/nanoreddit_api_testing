@@ -2,8 +2,6 @@ import allure
 import pytest
 from faker import Faker
 
-from src.models.api_model import ApiResponse
-
 fake = Faker()
 
 @allure.feature("Admin Controller")
@@ -13,8 +11,7 @@ fake = Faker()
 class TestAdminNegative:
     @allure.title("Проверка запрета доступа к профилю пользователя без прав администратора")
     def test_get_user_profile_no_admin(self, clients, user, user_auth_token):
-        """Тест обычный пользователь не может получить профиль через админский эндпоинт.
-        """
+        """Тест обычный пользователь не может получить профиль через админский эндпоинт."""
         with pytest.raises(PermissionError) as exc_info:
             clients.admin.get_user_profile(user.get("user_id"))
 
@@ -22,8 +19,7 @@ class TestAdminNegative:
 
     @allure.title("Получение профиля пользователя с невалидным ID")
     def test_get_user_profile_invalid_id(self, clients, admin_user):
-        """Тест получения профиля пользователя с невалидным ID.
-        """
+        """Тест получения профиля пользователя с невалидным ID."""
         user_id = fake.random_number(digits=3)
         validation_response = clients.admin.get_user_profile(user_id)
 
@@ -33,8 +29,7 @@ class TestAdminNegative:
 
     @allure.title("Попытка забанить пользователя с несуществующим email")
     def test_ban_user_invalid_email(self, clients, admin_user):
-        """Тест блокировки пользователя с несуществующим email.
-        """
+        """Тест блокировки пользователя с несуществующим email."""
         email = fake.email()
 
         validation_response = clients.admin.ban_user(email, 40)

@@ -1,8 +1,5 @@
 import allure
 import pytest
-from pydantic import ValidationError
-
-from src.models.api_model import ApiResponse
 
 
 @allure.feature("User Profile")
@@ -12,8 +9,7 @@ from src.models.api_model import ApiResponse
 class TestProfileNegative:
     @allure.title("Получение профиля без авторизации")
     def test_get_profile_no_auth(self, clients):
-        """Тест получение информации о профиле без авторизации.
-        """
+        """Тест получение информации о профиле без авторизации."""
         validation_response = clients.profile.get_profile_info()
 
         assert validation_response.status == "error", \

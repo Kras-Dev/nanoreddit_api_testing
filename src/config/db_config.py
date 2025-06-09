@@ -6,9 +6,10 @@ load_dotenv()
 
 class DataBaseConfig:
     """Класс для хранения конфигурационных данных базы данных.
-     Загружает параметры подключения к базе данных из переменных окружения,
-     определенных в `.env` файле
-     """
+
+    Загружает параметры подключения к базе данных из переменных окружения, определенных в `.env` файле
+    """
+
     DB_HOST = os.getenv("DB_HOST")
     DB_PORT = os.getenv("DB_PORT")
     DB_USER = os.getenv("DB_USER")
@@ -18,8 +19,7 @@ class DataBaseConfig:
 
     @classmethod
     def validate(cls) -> None:
-        """Проверяет наличие всех обязательных переменных окружения для подключения к базе данных.
-        """
+        """Проверяет наличие всех обязательных переменных окружения для подключения к базе данных."""
         required_vars = [cls.DB_HOST, cls.DB_PORT, cls.DB_USER, cls.DB_PASS, cls.DB_NAME]
         if any(var is None for var in required_vars):
             raise ValueError(

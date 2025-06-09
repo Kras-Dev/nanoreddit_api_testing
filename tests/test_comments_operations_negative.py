@@ -1,9 +1,6 @@
 import allure
 import pytest
 from faker import Faker
-from pydantic import ValidationError
-
-from src.models.api_model import ApiResponse
 
 fake = Faker()
 
@@ -14,8 +11,7 @@ fake = Faker()
 class TestCommentsNegative:
     @allure.title("Ответ на комментарий с несуществующим ID родителя")
     def test_comment_reply_invalid_id(self, clients, user):
-        """Тест попытки ответить на комментарий с несуществующим parent_comment_id
-        """
+        """Тест попытки ответить на комментарий с несуществующим parent_comment_id."""
         test_data = {
             "parent_comment_id": fake.uuid4(),
             "comment_text": fake.text(10)

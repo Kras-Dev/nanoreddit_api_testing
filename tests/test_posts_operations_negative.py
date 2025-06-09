@@ -11,8 +11,7 @@ fake = Faker()
 class TestPostsNegative:
     @allure.title("Получение поста без авторизации")
     def test_get_post_no_auth(self, clients):
-        """Тест получения информации о посте без авторизации
-        """
+        """Тест получения информации о посте без авторизации."""
         post_id = str(fake.uuid4())
 
         validation_response = clients.posts.get_post(post_id)
@@ -22,8 +21,7 @@ class TestPostsNegative:
 
     @allure.title("Получение поста с несуществующим ID")
     def test_get_post_invalid_id(self, clients, user):
-        """Тест получения поста с несуществующим ID.
-        """
+        """Тест получения поста с несуществующим ID."""
         post_id = fake.uuid4()
 
         validation_response = clients.posts.get_post(post_id)
@@ -33,8 +31,7 @@ class TestPostsNegative:
 
     @allure.title("Добавление комментария к несуществующему посту")
     def test_add_comment_invalid_post_id(self, clients, user):
-        """Тест добавления комментария к посту с несуществующим ID.
-        """
+        """Тест добавления комментария к посту с несуществующим ID."""
         test_data = {"post_id": fake.uuid4(), "comment_text": fake.text(12)}
 
         validation_response = clients.posts.add_comment(**test_data)
@@ -44,8 +41,7 @@ class TestPostsNegative:
 
     @allure.title("Голосование за пост с несуществующим ID")
     def test_vote_post_invalid_id(self, clients, user):
-        """Тест голосования за пост с несуществующим ID.
-        """
+        """Тест голосования за пост с несуществующим ID."""
         test_data = {"post_id": fake.uuid4(), "value": 1}
 
         validation_response = clients.posts.vote_post(**test_data)

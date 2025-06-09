@@ -1,5 +1,6 @@
 from faker import Faker
-from src.models.api_model import PostPublishResponse, PublishRequest
+
+from src.models.api_model import PublishRequest
 
 fake = Faker()
 
