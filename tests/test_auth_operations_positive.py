@@ -1,9 +1,8 @@
 import allure
 import pytest
 from faker import Faker
-from pydantic import ValidationError
 
-from src.models.api_model import ApiResponse
+from src.models.api_model import RegistrationRequest, LoginRequest
 
 fake = Faker()
 
@@ -20,58 +19,35 @@ def test_data():
 @allure.feature("Authentication")
 @allure.story("User Registration and Authentication")
 @pytest.mark.positive
+@pytest.mark.auth
 class TestAuth:
     @allure.title("Успешная регистрация")
-    def test_register_user(self, auth_controller, sql_client, test_data):
-        """
-        Тест регистрации нового пользователя.
+    def test_register_user(self, clients, test_data):
+        """Тест регистрации нового пользователя.
         Проверяет успешный ответ API и наличие пользователя в базе.
         """
-        with allure.step("Отправка запроса на регистрацию пользователя"):
-            try:
-                response = auth_controller.register(test_data)
-                response.raise_for_status()
-            except Exception as e:
-                pytest.fail(f"Ошибка при регистрации пользователя: {e}")
+        test_data = RegistrationRequest(**test_data)
 
-        with allure.step("Валидация ответа API"):
-            try:
-                validation_response = ApiResponse.model_validate(response.json())
-            except ValidationError as e:
-                pytest.fail(f"Ошибка валидации ответа API при регистрации: {e}")
+        validation_response = clients.auth.register(test_data)
 
-            assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
-
+        assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
         with allure.step("Проверка наличия пользователя в базе данных"):
-            assert sql_client.get_user_by_email(test_data["email"]) is not None, \
-                "Пользователь не найден в базе после регистрации"
+            assert clients.db.get_user_by_email(test_data.email) is not None, \
+                    "Пользователь не найден в базе после регистрации"
 
     @allure.title("Успешная авторизация")
-    def test_auth_user(self, auth_controller, test_data):
-        """
-        Тест авторизации существующего пользователя.
+    def test_auth_user(self, clients, test_data):
+        """Тест авторизации существующего пользователя.
         Проверяет успешный ответ API и наличие JWT токена в ответе.
         """
-        auth_data = {
-            "email": test_data["email"],
-            "password": test_data["password"],
-        }
-        with allure.step("Отправка запроса на авторизацию пользователя"):
-            try:
-                response = auth_controller.login(auth_data)
-                response.raise_for_status()
-            except Exception as e:
-                pytest.fail(f"Ошибка при авторизации пользователя: {e}")
+        test_data = LoginRequest(email=test_data["email"], password=test_data["password"])
 
-        with allure.step("Валидация ответа API"):
-            try:
-                validation_response = ApiResponse.model_validate(response.json())
-            except ValidationError as e:
-                pytest.fail(f"Ошибка валидации ответа API при авторизации: {e}")
+        validation_response = clients.auth.login(test_data)
 
-            assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
-            assert "jwt" in validation_response.responseData and validation_response.responseData[
-                    "jwt"], "JWT токен отсутствует в ответе логина"
+        assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
+        assert "jwt" in validation_response.responseData and validation_response.responseData[
+                "jwt"], "JWT токен отсутствует в ответе логина"
+
 
 
 

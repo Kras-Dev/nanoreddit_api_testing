@@ -1,7 +1,6 @@
 import allure
 import pytest
 from faker import Faker
-from pydantic import ValidationError
 
 from src.models.api_model import ApiResponse
 
@@ -10,67 +9,36 @@ fake = Faker()
 @allure.feature("Admin Controller")
 @allure.story("Admin Operations Negative")
 @pytest.mark.negative
+@pytest.mark.admin
 class TestAdminNegative:
     @allure.title("Проверка запрета доступа к профилю пользователя без прав администратора")
-    def test_get_user_profile_no_admin(self, user_auth_token, admin_controller, user):
+    def test_get_user_profile_no_admin(self, clients, user, user_auth_token):
+        """Тест обычный пользователь не может получить профиль через админский эндпоинт.
         """
-        Тест обычный пользователь не может получить профиль через админский эндпоинт.
-        """
-        with allure.step("Отправка запроса на получение информации о пользователе по ID без прав администратора"):
-            response = admin_controller.get_user_profile(user.get("user_id"))
-            assert response.status_code == 403, f"Ожидался статус 403, получен {response.status_code}"
+        with pytest.raises(PermissionError) as exc_info:
+            clients.admin.get_user_profile(user.get("user_id"))
 
-            with allure.step("Валидация ответа API"):
-                try:
-                    validation_response = ApiResponse.model_validate(response.json())
-                except ValidationError as e:
-                    pytest.fail(f"{e}")
-
-            assert validation_response.status == "error", "Ожидался статус 'error' в ответе"
-            assert validation_response.error == "Access denied", "Ожидалось сообщение 'Access denied'"
+        assert "требуется роль ADMIN" in str(exc_info.value), "Ожидалось сообщение о необходимости роли ADMIN"
 
     @allure.title("Получение профиля пользователя с невалидным ID")
-    def test_get_user_profile_invalid_id(self, admin_user, admin_controller):
-        """
-        Тест получения профиля пользователя с невалидным ID.
+    def test_get_user_profile_invalid_id(self, clients, admin_user):
+        """Тест получения профиля пользователя с невалидным ID.
         """
         user_id = fake.random_number(digits=3)
-        with allure.step(f"Отправка запроса на получение информации о пользователе с ID {user_id}"):
-            try:
-                response = admin_controller.get_user_profile(user_id)
-                response.raise_for_status()
-            except Exception as e:
-                pytest.fail(f"Ошибка при запросе профиля пользователя: {e}")
+        validation_response = clients.admin.get_user_profile(user_id)
 
-        with allure.step("Валидация ответа API"):
-            try:
-                validation_response = ApiResponse.model_validate(response.json())
-            except ValidationError as e:
-                pytest.fail(f"Ошибка валидации ответа API: {e}")
-
-            assert validation_response.status == "error", "Ожидался статус 'error' в ответе"
-            assert validation_response.error == f"User not found with id: {user_id}", \
-                f"Ожидалось сообщение об ошибке для ID {user_id}"
+        assert validation_response.status == "error", "Ожидался статус 'error' в ответе"
+        assert validation_response.error == f"User not found with id: {user_id}", \
+            f"Ожидалось сообщение об ошибке для ID {user_id}"
 
     @allure.title("Попытка забанить пользователя с несуществующим email")
-    def test_ban_user_invalid_email(self, admin_user, admin_controller):
-        """
-        Тест блокировки пользователя с несуществующим email.
+    def test_ban_user_invalid_email(self, clients, admin_user):
+        """Тест блокировки пользователя с несуществующим email.
         """
         email = fake.email()
-        with allure.step(f"Отправка запроса на бан пользователя с email {email}"):
-            try:
-                response = admin_controller.ban_user(email, 40)
-                response.raise_for_status()
-            except Exception as e:
-                pytest.fail(f"Ошибка при бане пользователя: {e}")
 
-        with allure.step("Валидация ответа API"):
-            try:
-                validation_response = ApiResponse.model_validate(response.json())
-            except ValidationError as e:
-                pytest.fail(f"Ошибка валидации ответа API: {e}")
+        validation_response = clients.admin.ban_user(email, 40)
 
-            assert validation_response.status == "error", "Ожидался статус 'error' в ответе"
-            assert validation_response.error == f"User not found with email: {email}", \
-                f"Ожидалось сообщение об ошибке для email {email}"
+        assert validation_response.status == "error", "Ожидался статус 'error' в ответе"
+        assert validation_response.error == f"User not found with email: {email}", \
+            f"Ожидалось сообщение об ошибке для email {email}"

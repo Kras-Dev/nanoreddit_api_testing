@@ -1,4 +1,3 @@
-import requests
 
 from src.config.api_endpoints import ApiEndpoints
 from src.clients.http_client.base_client import BaseClient
@@ -12,22 +11,21 @@ class AuthController:
     def __init__(self, base_client: BaseClient) -> None:
         self.api = base_client
 
-    def register(self, data: dict, status_code=200) ->requests.Response:
+    def register(self, data: RegistrationRequest) -> ApiResponse:
         """
         Регистрация нового пользователя с валидацией данных через Pydantic.
         """
-        data = RegistrationRequest.model_validate(data)
-        response = self.api.post_request(ApiEndpoints.AUTH_REGISTER, json=data.model_dump(), status_code)
-        return response
+        response = self.api.post_request(ApiEndpoints.AUTH_REGISTER, json=data.model_dump())
+        validation_response = ApiResponse.model_validate(response.json())
+        return validation_response
 
-    def login(self, data: dict) -> requests.Response:
+    def login(self, data: LoginRequest) -> ApiResponse:
         """
         Авторизация пользователя с валидацией данных через Pydantic.
         """
-        data = LoginRequest.model_validate(data)
         response = self.api.post_request(ApiEndpoints.AUTH_LOGIN, json=data.model_dump())
         validation_response = ApiResponse.model_validate(response.json())
         token = (validation_response.responseData or {}).get("jwt")
         if token:
             self.api.set_token(token)
-        return response
+        return validation_response

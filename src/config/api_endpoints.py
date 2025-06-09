@@ -1,17 +1,22 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 class ApiEndpoints:
+    """Класс, содержащий базовый URL и пути к основным API-эндпоинтам сервера.
+    Загружает параметры из переменных окружения, определенных в `.env` файле.
     """
-    Класс, содержащий базовый URL и пути к основным API-эндпоинтам сервера.
-    """
-    BASE_URL = "http://localhost:8080"
-    AUTH_REGISTER = "/api/v1/auth/register"
-    AUTH_LOGIN = "/api/v1/auth/login"
-    POSTS = "/api/v1/posts"
-    POST = "/api/v1/posts/{post_id}"
-    POST_VOTE = "/api/v1/posts/{post_id}/vote"
-    POST_ADD_COMMENT = "/api/v1/posts/{post_id}/addComment"
-    POST_PUBLISH = "/api/v1/posts/publish"
-    PROFILE_INFO = "/api/v1/profile/info"
-    ADMIN_PROFILE_INFO = "/api/v1/admin/user/{user_id}"
-    ADMIN_BAN_USER = "/api/v1/admin/management/ban/byEmail/{email}"
-    ADMIN_UNBAN_USER = "/api/v1/admin/management/unban/byEmail/{email}"
-    COMMENT_REPLY = "/api/v1/comments/{parentCommentId}/reply"
+    BASE_URL = os.getenv("BASE_URL")
+    AUTH_REGISTER = os.getenv("AUTH_REGISTER")
+    AUTH_LOGIN = os.getenv("AUTH_LOGIN")
+    POSTS = os.getenv("POSTS")
+    POST = os.getenv("POST")
+    POST_VOTE = os.getenv("POST_VOTE")
+    POST_ADD_COMMENT = os.getenv("POST_ADD_COMMENT")
+    POST_PUBLISH = os.getenv("POST_PUBLISH")
+    PROFILE_INFO = os.getenv("PROFILE_INFO")
+    ADMIN_PROFILE_INFO = os.getenv("ADMIN_PROFILE_INFO")
+    ADMIN_BAN_USER = os.getenv("ADMIN_BAN_USER")
+    ADMIN_UNBAN_USER = os.getenv("ADMIN_UNBAN_USER")
+    COMMENT_REPLY = os.getenv("COMMENT_REPLY")

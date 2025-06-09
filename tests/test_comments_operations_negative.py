@@ -10,28 +10,18 @@ fake = Faker()
 @allure.feature("Comment Controller")
 @allure.story("Comment Operations Negative")
 @pytest.mark.negative
+@pytest.mark.comments
 class TestCommentsNegative:
     @allure.title("Ответ на комментарий с несуществующим ID родителя")
-    def test_comment_reply_invalid_id(self, user, comments_controller):
-        """
-        Тест попытки ответить на комментарий с несуществующим parent_comment_id
+    def test_comment_reply_invalid_id(self, clients, user):
+        """Тест попытки ответить на комментарий с несуществующим parent_comment_id
         """
         test_data = {
             "parent_comment_id": fake.uuid4(),
             "comment_text": fake.text(10)
         }
-        with allure.step("Отправка запроса на ответ на комментарий с несуществующим ID родителя"):
-            try:
-                response = comments_controller.reply_to_comment(**test_data)
-                response.raise_for_status()
-            except Exception as e:
-                pytest.fail(f"Ошибка при ответе на комментарий с несуществующим ID родителя: {e}")
 
-        with allure.step("Валидация ответа API"):
-            try:
-                validation_response = ApiResponse.model_validate(response.json())
-            except ValidationError as e:
-                pytest.fail(f"Ошибка валидации ответа API: {e}")
+        validation_response = clients.comments.reply_to_comment(**test_data)
 
         assert validation_response.status == "error", \
             f"Ожидался статус 'error', получен '{validation_response.status}'"

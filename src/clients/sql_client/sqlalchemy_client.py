@@ -12,16 +12,14 @@ custom_logger = CustomLogger(__name__)
 class SqlAlchemyClient:
     """ Клиент для взаимодействия с базой данных через SQLAlchemy."""
     def __init__(self) -> None:
-        """
-        Инициализация клиента с соединением с базой данных.
+        """Инициализация клиента с соединением с базой данных.
         """
         self.connection = SQLAlchemyConnection()
         self.connection.connect()
         self.metadata = Base.metadata
 
     def _execute_db_operation(self, operation: Callable[[Any], Any]) -> Optional[Any]:
-        """
-        Универсальный метод для выполнения операций с базой данных.
+        """Универсальный метод для выполнения операций с базой данных.
         """
         try:
             with self.connection.get_session() as session:
@@ -57,26 +55,20 @@ class SqlAlchemyClient:
         result = self._execute_db_operation(operation)
         return bool(result)
 
+    @allure.step("Получить пользователя по email.")
     def get_user_by_email(self, user_email: str) -> Optional[User]:
-        """
-        Получить пользователя по email.
-        """
         def operation(session):
             return session.query(User).filter_by(email=user_email).one_or_none()
         return self._execute_db_operation(operation)
 
+    @allure.step("Получить пост по id.")
     def get_post_by_id(self, post_id: str) -> Optional[Post]:
-        """
-        Получить пост по id.
-        """
         def operation(session):
             return session.query(Post).filter_by(id=post_id).one_or_none()
         return self._execute_db_operation(operation)
 
+    @allure.step("Удалить пост по post_id.")
     def delete_post_by_author_id(self, author_id: int) -> bool:
-        """
-        Удалить пост по post_id.
-        """
         def operation(session):
             posts = session.query(Post).filter_by(author_id=author_id).all()
             if not posts:
@@ -88,26 +80,20 @@ class SqlAlchemyClient:
         result = self._execute_db_operation(operation)
         return bool(result)
 
+    @allure.step("Получить комментарий по post_id.")
     def get_comment_by_post_id(self, post_id: str) -> Optional[Comment]:
-        """
-        Получить комментарий по post_id.
-        """
         def operation(session):
             return session.query(Comment).filter_by(post_id=post_id).one_or_none()
         return self._execute_db_operation(operation)
 
+    @allure.step("Получить комментарий по id.")
     def get_comment_by_id(self, comment_id: str) -> Optional[Comment]:
-        """
-        Получить комментарий по id.
-        """
         def operation(session):
             return session.query(Comment).filter_by(id=comment_id).one_or_none()
         return self._execute_db_operation(operation)
 
+    @allure.step("Удалить все комментарии пользователя по author_id.")
     def delete_comments_by_author_id(self, author_id: int) -> bool:
-        """
-        Удалить все комментарии пользователя по author_id.
-        """
         def operation(session):
             comments = session.query(Comment).filter_by(author_id=author_id).all()
             if not comments:
@@ -119,10 +105,8 @@ class SqlAlchemyClient:
         result = self._execute_db_operation(operation)
         return bool(result)
 
+    @allure.step("Получить количество голосов за пост.")
     def get_post_vote_value(self, post_id: str) -> Optional[int]:
-        """
-        Получить количество голосов за пост
-        """
         def operation(session):
             vote = session.query(Vote).filter_by(post_id=post_id).first()
             if vote is None:
@@ -132,10 +116,8 @@ class SqlAlchemyClient:
         result = self._execute_db_operation(operation)
         return result
 
+    @allure.step("Удалить голоса за посты по user_id.")
     def delete_votes_by_user_id(self, user_id: int) -> bool:
-        """
-        Удалить голоса за посты по user_id.
-        """
         def operation(session):
             votes = session.query(Vote).filter_by(user_id=user_id).all()
             if not votes:
@@ -147,19 +129,15 @@ class SqlAlchemyClient:
         result = self._execute_db_operation(operation)
         return bool(result)
 
+    @allure.step("Очистить все данные созданные пользователем и удалить его.")
     def clear_user_data(self, user_id: int):
-        """
-        Очищает все данные созданные пользователем и удаляет его.
-        """
         self.delete_votes_by_user_id(user_id)
         self.delete_comments_by_author_id(user_id)
         self.delete_post_by_author_id(user_id)
         self.delete_user(user_id)
 
+    @allure.step("Очистить все данные из всех таблиц в базе данных.")
     def clear_all_tables(self) -> None:
-        """
-        Очищает все данные из всех таблиц в базе данных.
-        """
         def operation(session):
             for table in reversed(self.metadata.sorted_tables):
                 session.execute(table.delete())
@@ -167,8 +145,6 @@ class SqlAlchemyClient:
             session.execute(text("ALTER SEQUENCE users_id_seq RESTART WITH 1"))
         self._execute_db_operation(operation)
 
+    @allure.step("Закрыть соединение с базой.")
     def disconnect(self) -> None:
-        """
-        Закрыть соединение с базой.
-        """
         self.connection.disconnect()

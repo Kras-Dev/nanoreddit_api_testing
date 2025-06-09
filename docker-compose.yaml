@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: nanoreddit
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+  app:
+    image: svirid0v/nanoreddit-em:1.1
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nanoreddit
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+
+volumes:
+  postgres_data:

@@ -6,8 +6,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 def validate_password_complexity(password: str) -> str:
-    """
-    Проверяет сложность пароля на соответствие требованиям.
+    """Проверяет сложность пароля на соответствие требованиям.
     """
     if len(password) < 8:
         raise ValueError("Password must be at least 8 characters long")
@@ -67,8 +66,7 @@ class LoginRequest(BaseModel):
         return validate_password_complexity(password)
 
 class ProfileDataComponent(BaseModel):
-    """
-    Модель данных профиля пользователя.
+    """Модель данных профиля пользователя.
 
     Используется в ответах:
 
@@ -82,8 +80,7 @@ class ProfileDataComponent(BaseModel):
     authorities: List[str] = Field(..., description="List of user roles")
 
 class ProfileResponse(ApiResponse):
-    """
-    Модель ответа на запрос информации о профиле пользователя.
+    """Модель ответа на запрос информации о профиле пользователя.
 
     Используется в POST /api/v1/profile/info.
     """
@@ -91,8 +88,7 @@ class ProfileResponse(ApiResponse):
     message: Optional[str] = Field(None, description="Additional message from the server")
 
 class PublishRequest(BaseModel):
-    """
-    Модель запроса на публикацию нового поста.
+    """Модель запроса на публикацию нового поста.
 
     Используется в POST /api/v1/posts/publish.
     """
@@ -100,8 +96,7 @@ class PublishRequest(BaseModel):
     content: str = Field(..., min_length=1, description="Content is required")
 
 class PostPublishComponent(BaseModel):
-    """
-    Модель данных о созданном посте.
+    """Модель данных о созданном посте.
 
     Используется в ответах на POST /api/v1/posts/publish.
     """
@@ -112,16 +107,14 @@ class PostPublishComponent(BaseModel):
     createdAt: datetime = Field(..., description="Post creation date")
 
 class PostPublishResponse(ApiResponse):
-    """
-    Модель ответа на публикацию поста.
+    """Модель ответа на публикацию поста.
 
     Используется в POST /api/v1/posts/publish.
     """
     responseData: Optional[PostPublishComponent] = Field(None, description="Post data")
 
 class Pageable(BaseModel):
-    """
-    Модель параметров пагинации.
+    """Модель параметров пагинации.
 
     Используется в GET /api/v1/posts и других эндпоинтах с пагинацией.
     """
@@ -130,16 +123,14 @@ class Pageable(BaseModel):
     sort: Optional[List[str]] = Field(default_factory=list, description="Sort options asc|desc")
 
 class NewCommentRequest(BaseModel):
-    """
-    Модель запроса на добавление комментария к посту.
+    """Модель запроса на добавление комментария к посту.
 
     Используется в POST /api/v1/posts/{postId}/addComment.
     """
     text: str = Field(..., max_length=255, description="Comment")
 
 class CommentResponse(BaseModel):
-    """
-    Модель ответа с данными комментария.
+    """Модель ответа с данными комментария.
 
     Включает информацию о самом комментарии и вложенных ответах (реплаях).
     """
@@ -150,16 +141,14 @@ class CommentResponse(BaseModel):
     replies: List["CommentResponse"] = Field(default_factory=list, description="Replies data")
 
 class CommentApiResponse(ApiResponse):
-    """
-    Модель ответа API при добавлении ответа на комментарий.
+    """Модель ответа API при добавлении ответа на комментарий.
 
     Используется в POST /api/v1/comments/{parentCommentId}/reply.
     """
     responseData: Optional[CommentResponse] = Field(None, description="Data of the created comment")
 
 class PostDataComponent(BaseModel):
-    """
-    Модель данных поста с комментариями.
+    """Модель данных поста с комментариями.
 
     Используется в ответах GET /api/v1/posts/{postId}.
     """
@@ -169,16 +158,14 @@ class PostDataComponent(BaseModel):
     hasMoreComments: bool = Field(..., description="Flag of additional comments")
 
 class PostDataResponse(ApiResponse):
-    """
-    Модель ответа данных информации о посте.
+    """Модель ответа данных информации о посте.
 
     Используется в ответах GET /api/v1/posts/{postId}.
     """
-    responseData: PostDataComponent = Field(..., description="Post data with comments and votes")
+    responseData: Optional[PostDataComponent] = Field(None, description="Post data with comments and votes")
 
 class PostsPageDataComponent(BaseModel):
-    """
-    Модель данных страницы с постами и информацией о пагинации.
+    """Модель данных страницы с постами и информацией о пагинации.
 
     Используется в ответах GET /api/v1/posts.
     """
@@ -189,32 +176,28 @@ class PostsPageDataComponent(BaseModel):
     totalPages: int = Field(..., ge=0, description="Total number of pages")
 
 class PostsResponse(ApiResponse):
-    """
-    Модель ответа на запрос списка постов с пагинацией.
+    """Модель ответа на запрос списка постов с пагинацией.
 
     Используется в GET /api/v1/posts.
     """
     responseData: Optional[PostsPageDataComponent] = Field(None, description="Data with posts and pagination")
 
 class AdminUserResponse(ApiResponse):
-    """
-    Модель ответа на запрос информации о пользователе по id (для админа).
+    """Модель ответа на запрос информации о пользователе по id (для админа).
 
     Используется в POST /api/v1/admin/user/{id}.
     """
     responseData: Optional[ProfileDataComponent] = Field(None, description="Profile data")
 
 class UnbanUserData(BaseModel):
-    """
-    Модель данных о результате разбана пользователя (для админа).
+    """Модель данных о результате разбана пользователя (для админа).
 
     Используется в POST /api/v1/admin/management/unban/byEmail/{email}.
     """
     bannedUntil: Optional[datetime] = Field(None, description="Ban end date")
 
 class UnbanUserResponse(ApiResponse):
-    """
-    Модель ответа на запрос разбана пользователя (для админа).
+    """Модель ответа на запрос разбана пользователя (для админа).
 
     Используется в POST /api/v1/admin/management/unban/byEmail/{email}.
     """
@@ -222,16 +205,14 @@ class UnbanUserResponse(ApiResponse):
     message: Optional[str] = Field(None, description="Additional server message")
 
 class BanUserData(BaseModel):
-    """
-    Модель данных о результате бана пользователя (для админа).
+    """Модель данных о результате бана пользователя (для админа).
 
     Используется в POST /api/v1/admin/management/ban/byEmail/{email}.
     """
     bannedUntil: Optional[datetime] = Field(None, description="Ban end date")
 
 class BanUserResponse(ApiResponse):
-    """
-    Модель ответа на запрос бана пользователя (для админа).
+    """Модель ответа на запрос бана пользователя (для админа).
 
     Используется в POST /api/v1/admin/management/ban/byEmail/{email}.
     """
