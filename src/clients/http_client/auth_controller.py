@@ -1,3 +1,4 @@
+import allure
 
 from src.clients.http_client.base_client import BaseClient
 from src.config.api_endpoints import ApiEndpoints
@@ -10,12 +11,14 @@ class AuthController:
     def __init__(self, base_client: BaseClient) -> None:
         self.api = base_client
 
+    @allure.step("Регистрация нового пользователя с данными: {data}")
     def register(self, data: RegistrationRequest) -> ApiResponse:
         """Регистрация нового пользователя с валидацией данных через Pydantic."""
         response = self.api.post_request(ApiEndpoints.AUTH_REGISTER, json=data.model_dump())
         validation_response = ApiResponse.model_validate(response.json())
         return validation_response
 
+    @allure.step("Авторизация пользователя с данными: {data}")
     def login(self, data: LoginRequest) -> ApiResponse:
         """Авторизация пользователя с валидацией данных через Pydantic."""
         response = self.api.post_request(ApiEndpoints.AUTH_LOGIN, json=data.model_dump())

@@ -1,3 +1,4 @@
+import allure
 
 from src.clients.http_client.base_client import BaseClient
 from src.config.api_endpoints import ApiEndpoints
@@ -10,6 +11,7 @@ class ProfileController:
     def __init__(self, base_client: BaseClient):
         self.api = base_client
 
+    @allure.step('Получение информации профиля пользователя')
     def get_profile_info(self) -> ProfileResponse:
         """Получение профиля пользователя."""
         response = self.api.post_request(ApiEndpoints.PROFILE_INFO)

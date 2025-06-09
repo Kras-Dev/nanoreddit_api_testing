@@ -1,5 +1,7 @@
 from uuid import UUID
 
+import allure
+
 from src.clients.http_client.base_client import BaseClient
 from src.config.api_endpoints import ApiEndpoints
 from src.models.api_model import CommentApiResponse, NewCommentRequest
@@ -10,6 +12,7 @@ class CommentsController:
         """Клиент для работы с комментариями через API."""
         self.api = base_client
 
+    @allure.step("Ответить на комментарий с id: {parent_comment_id} текстом: {comment_text}")
     def reply_to_comment(self, parent_comment_id: str, comment_text: str) -> CommentApiResponse:
         """Отправляет ответ на комментарий с указанным parent_comment_id."""
         try:

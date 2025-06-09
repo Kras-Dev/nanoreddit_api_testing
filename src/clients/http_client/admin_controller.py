@@ -1,3 +1,4 @@
+import allure
 
 from src.clients.http_client.base_client import BaseClient
 from src.clients.http_client.profile_controller import ProfileController
@@ -15,6 +16,7 @@ class AdminController:
     def __init__(self, api_client: BaseClient):
         self.api = api_client
 
+    @allure.step("Получение профиля пользователя по ID: {user_id}")
     def get_user_profile(self, user_id: int) -> AdminUserResponse:
         """Получить профиль пользователя по ID."""
         self._check_admin()
@@ -23,15 +25,17 @@ class AdminController:
         validation_response = AdminUserResponse.model_validate(response.json())
         return validation_response
 
+    @allure.step("Блокировка пользователя с email: {email} на {ban_duration} секунд")
     def ban_user(self, email: str, ban_duration: int) -> BanUserResponse:
         """Заблокировать пользователя по email на заданный период."""
         self._check_admin()
         endpoint = ApiEndpoints.ADMIN_BAN_USER.format(email=str(email))
-        params = {"email": email, "froSeconds": ban_duration}
+        params = {"email": email, "forSeconds": ban_duration}
         response = self.api.post_request(endpoint, params=params)
         validation_response = BanUserResponse.model_validate(response.json())
         return validation_response
 
+    @allure.step("Разблокировка пользователя с email: {email}")
     def unban_user(self, email: str) -> UnbanUserResponse:
         """Разблокировать пользователя по email."""
         self._check_admin()
@@ -41,6 +45,7 @@ class AdminController:
         validation_response = UnbanUserResponse.model_validate(response.json())
         return validation_response
 
+    @allure.step("Проверка роли ADMIN у текущего пользователя")
     def _check_admin(self) -> None:
         """Проверить роль ADMIN."""
         profile_controller = ProfileController(self.api)

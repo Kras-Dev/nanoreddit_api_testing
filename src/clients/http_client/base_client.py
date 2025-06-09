@@ -23,6 +23,7 @@ class BaseClient:
 
     @property
     def token(self) -> Optional[str]:
+        """Текущий JWT токен, используемый для авторизации."""
         return self._token
 
     def clear_token(self) -> None:
