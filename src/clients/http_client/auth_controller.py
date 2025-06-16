@@ -14,16 +14,22 @@ class AuthController:
     @allure.step("Регистрация нового пользователя с данными: {data}")
     def register(self, data: RegistrationRequest) -> ApiResponse:
         """Регистрация нового пользователя с валидацией данных через Pydantic."""
-        response = self.api.post_request(ApiEndpoints.AUTH_REGISTER, json=data.model_dump())
-        validation_response = ApiResponse.model_validate(response.json())
-        return validation_response
+        response = self.api.post_parse_request(
+            path=ApiEndpoints.AUTH_REGISTER,
+            response_model=ApiResponse,
+            json=data.model_dump()
+        )
+        return response
 
     @allure.step("Авторизация пользователя с данными: {data}")
     def login(self, data: LoginRequest) -> ApiResponse:
         """Авторизация пользователя с валидацией данных через Pydantic."""
-        response = self.api.post_request(ApiEndpoints.AUTH_LOGIN, json=data.model_dump())
-        validation_response = ApiResponse.model_validate(response.json())
-        token = (validation_response.responseData or {}).get("jwt")
+        response = self.api.post_parse_request(
+            path=ApiEndpoints.AUTH_LOGIN,
+            response_model=ApiResponse,
+            json=data.model_dump()
+        )
+        token = (response.responseData or {}).get("jwt")
         if token:
             self.api.set_token(token)
-        return validation_response
+        return response

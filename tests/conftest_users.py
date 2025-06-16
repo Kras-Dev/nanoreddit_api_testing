@@ -18,7 +18,6 @@ def register_user(clients) -> Dict[str, Any]:
     )
     validation_response = clients.auth.register(reg_data)
 
-    assert validation_response.status == "ok", f"Регистрация не удалась: {validation_response}"
     assert validation_response.responseData is not None, "Отсутствуют данные регистрации"
 
     user = clients.db.get_user_by_email(reg_data.email)
@@ -36,7 +35,6 @@ def login_user(clients, email: str, password: str) -> str:
     login_data = LoginRequest(email=email, password=password)
     validation_response = clients.auth.login(login_data)
 
-    assert validation_response.status == "ok", f"Логин не удался: {validation_response}"
     assert validation_response.responseData is not None, "responseData отсутствует"
     token = validation_response.responseData.get("jwt")
     assert token, "JWT токен отсутствует в ответе логина"

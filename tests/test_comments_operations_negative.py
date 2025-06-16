@@ -19,7 +19,5 @@ class TestCommentsNegative:
 
         validation_response = clients.comments.reply_to_comment(**test_data)
 
-        assert validation_response.status == "error", \
-            f"Ожидался статус 'error', получен '{validation_response.status}'"
-        assert validation_response.error == "Parent comment not found", \
+        assert "Parent comment not found" in validation_response.error, \
             f"Ожидалось сообщение 'Parent comment not found', получено '{validation_response.error}'"

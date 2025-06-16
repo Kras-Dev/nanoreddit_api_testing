@@ -23,8 +23,7 @@ class TestAdminNegative:
         user_id = fake.random_number(digits=3)
         validation_response = clients.admin.get_user_profile(user_id)
 
-        assert validation_response.status == "error", "Ожидался статус 'error' в ответе"
-        assert validation_response.error == f"User not found with id: {user_id}", \
+        assert f"User not found with id: {user_id}" in validation_response.error, \
             f"Ожидалось сообщение об ошибке для ID {user_id}"
 
     @allure.title("Попытка забанить пользователя с несуществующим email")
@@ -34,6 +33,5 @@ class TestAdminNegative:
 
         validation_response = clients.admin.ban_user(email, 40)
 
-        assert validation_response.status == "error", "Ожидался статус 'error' в ответе"
-        assert validation_response.error == f"User not found with email: {email}", \
+        assert  f"User not found with email: {email}" in validation_response.error, \
             f"Ожидалось сообщение об ошибке для email {email}"

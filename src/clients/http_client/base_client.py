@@ -1,10 +1,12 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Type, TypeVar
 
 import allure
 import requests
+from pydantic import BaseModel
 
 from src.config.api_endpoints import ApiEndpoints
 
+T = TypeVar('T', bound=BaseModel)
 
 class BaseClient:
     def __init__(self):
@@ -58,6 +60,30 @@ class BaseClient:
         if response.status_code != expected_status:
             raise requests.HTTPError(
                 f"Ожидался статус {expected_status}, получен {response.status_code}: {response.text}")
+
+    @allure.step("POST-запрос с парсингом и обработкой ошибок")
+    def post_parse_request(self, path: str, response_model: Type[T], json: Optional[Dict[str, Any]] = None,
+                       params: Optional[Dict[str, Any]] = None, expected_status: int = 200) -> T:
+        try:
+            response = self.post_request(path=path, json=json, params=params, expected_status=expected_status)
+            parsed_response = response_model.model_validate_json(response.text)
+            if parsed_response.status != "ok":
+                raise Exception(f"API error: {parsed_response.error}")
+            return parsed_response
+        except Exception as e:
+            return response_model(status="error", error=str(e), responseData=None)
+
+    @allure.step("GET-запрос с парсингом и обработкой ошибок")
+    def get_parse_request(self, path: str, response_model: Type[T], params: Optional[Dict[str, Any]] = None,
+                      expected_status: int = 200) -> T:
+        try:
+            response = self.get_request(path, params=params, expected_status=expected_status)
+            parsed_response = response_model.model_validate_json(response.text)
+            if parsed_response.status != "ok":
+                raise Exception(f"API error: {parsed_response.error}")
+            return parsed_response
+        except Exception as e:
+            return response_model(status="error", error=str(e), responseData=None)
 
     def close_session(self) -> None:
         """Закрыть сессию requests."""

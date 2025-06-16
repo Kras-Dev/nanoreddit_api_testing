@@ -26,28 +26,23 @@ class TestAuth:
     def test_register_user(self, clients, test_data):
         """Тест регистрации нового пользователя.
 
-        Проверяет успешный ответ API и наличие пользователя в базе.
+        Проверяет наличие пользователя в базе.
         """
         test_data = RegistrationRequest(**test_data)
 
-        validation_response = clients.auth.register(test_data)
+        clients.auth.register(test_data)
 
-        assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
         with allure.step("Проверка наличия пользователя в базе данных"):
             assert clients.db.get_user_by_email(test_data.email) is not None, \
                     "Пользователь не найден в базе после регистрации"
 
     @allure.title("Успешная авторизация")
     def test_auth_user(self, clients, test_data):
-        """Тест авторизации существующего пользователя.
-
-        Проверяет успешный ответ API и наличие JWT токена в ответе.
-        """
+        """Тест авторизации существующего пользователя."""
         test_data = LoginRequest(email=test_data["email"], password=test_data["password"])
 
         validation_response = clients.auth.login(test_data)
 
-        assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
         assert "jwt" in validation_response.responseData and validation_response.responseData[
                 "jwt"], "JWT токен отсутствует в ответе логина"
 

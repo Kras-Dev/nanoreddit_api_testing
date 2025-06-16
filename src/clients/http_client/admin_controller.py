@@ -21,9 +21,11 @@ class AdminController:
         """Получить профиль пользователя по ID."""
         self._check_admin()
         endpoint = ApiEndpoints.ADMIN_PROFILE_INFO.format(user_id=str(user_id))
-        response = self.api.post_request(endpoint)
-        validation_response = AdminUserResponse.model_validate(response.json())
-        return validation_response
+        response = self.api.post_parse_request(
+            path=endpoint,
+            response_model=AdminUserResponse
+        )
+        return response
 
     @allure.step("Блокировка пользователя с email: {email} на {ban_duration} секунд")
     def ban_user(self, email: str, ban_duration: int) -> BanUserResponse:
@@ -31,9 +33,12 @@ class AdminController:
         self._check_admin()
         endpoint = ApiEndpoints.ADMIN_BAN_USER.format(email=str(email))
         params = {"email": email, "forSeconds": ban_duration}
-        response = self.api.post_request(endpoint, params=params)
-        validation_response = BanUserResponse.model_validate(response.json())
-        return validation_response
+        response = self.api.post_parse_request(
+            path=endpoint,
+            response_model=BanUserResponse,
+            params=params)
+
+        return response
 
     @allure.step("Разблокировка пользователя с email: {email}")
     def unban_user(self, email: str) -> UnbanUserResponse:
@@ -41,9 +46,12 @@ class AdminController:
         self._check_admin()
         endpoint = ApiEndpoints.ADMIN_UNBAN_USER.format(email=str(email))
         params = {"email": email}
-        response = self.api.post_request(endpoint, params=params)
-        validation_response = UnbanUserResponse.model_validate(response.json())
-        return validation_response
+        response = self.api.post_parse_request(
+            path=endpoint,
+            response_model=UnbanUserResponse,
+            params=params)
+
+        return response
 
     @allure.step("Проверка роли ADMIN у текущего пользователя")
     def _check_admin(self) -> None:

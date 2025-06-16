@@ -22,6 +22,10 @@ class CommentsController:
         data = NewCommentRequest(text=comment_text)
         endpoint = ApiEndpoints.COMMENT_REPLY.format(parentCommentId=str(parent_comment_id))
         params = {"text": data}
-        response = self.api.post_request(endpoint, json=data.model_dump(), params=params)
-        validation_response = CommentApiResponse.model_validate(response.json())
-        return validation_response
+        response = self.api.post_parse_request(
+            path=endpoint,
+            response_model=CommentApiResponse,
+            json=data.model_dump(),
+            params=params)
+
+        return response

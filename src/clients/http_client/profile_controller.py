@@ -14,6 +14,7 @@ class ProfileController:
     @allure.step('Получение информации профиля пользователя')
     def get_profile_info(self) -> ProfileResponse:
         """Получение профиля пользователя."""
-        response = self.api.post_request(ApiEndpoints.PROFILE_INFO)
-        validation_response = ProfileResponse.model_validate(response.json())
-        return validation_response
+        return self.api.post_parse_request(
+            path=ApiEndpoints.PROFILE_INFO,
+            response_model=ProfileResponse
+        )

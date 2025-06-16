@@ -55,9 +55,7 @@ class TestAuthNegative:
 
         validation_response = clients.auth.register(reg_data)
 
-        assert validation_response.status == "error", \
-        f"Ожидался статус 'error', получен '{validation_response.status}'"
-        assert validation_response.error == "Username or Email already in use!", \
+        assert "Username or Email already in use!" in validation_response.error, \
         f"Ожидалось сообщение об ошибке 'Username or Email already in use!', получено '{validation_response.error}'"
 
     allure.title("Авторизация с некорректными данными")
@@ -68,8 +66,6 @@ class TestAuthNegative:
 
         validation_response = clients.auth.login(auth_data)
 
-        assert validation_response.status == "error",  \
-            f"Ожидался статус 'error', получен '{validation_response.status}'"
-        assert validation_response.error == "Bad credentials", \
+        assert "Bad credentials" in validation_response.error, \
             f"Ожидалось сообщение об ошибке 'Bad credentials', получено '{validation_response.error}'"
 

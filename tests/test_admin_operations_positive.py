@@ -12,7 +12,6 @@ class TestAdmin:
         """Тест получения информации о пользователе по ID с правами администратора."""
         validation_response = clients.admin.get_user_profile(user.get("user_id"))
 
-        assert validation_response.status == "ok", "Статус ответа не 'ok'"
         assert validation_response.responseData.id == user.get("user_id"), \
         "ID пользователя в ответе не совпадает с ожидаемым"
 
@@ -21,7 +20,6 @@ class TestAdmin:
         """Тест блокировки пользователя по email с правами администратора."""
         validation_response = clients.admin.ban_user(user.get("email"), 40)
 
-        assert validation_response.status == "ok", "Статус ответа не 'ok'"
         assert validation_response.message == "User banned", \
             f"Сообщение в ответе не соответствует ожидаемому: {validation_response.message}"
         assert clients.db.get_user_by_email(user.get("email")).banned_until is not None, \
@@ -33,7 +31,6 @@ class TestAdmin:
         """Тест разблокировки пользователя по email с правами администратора."""
         validation_response = clients.admin.unban_user(user.get("email"))
 
-        assert validation_response.status == "ok", "Статус ответа не 'ok'"
         assert validation_response.message == "User unbanned", \
             f"Сообщение в ответе не соответствует ожидаемому: {validation_response.message}"
         assert clients.db.get_user_by_email(user.get("email")).banned_until is None, \

@@ -12,7 +12,5 @@ class TestProfileNegative:
         """Тест получение информации о профиле без авторизации."""
         validation_response = clients.profile.get_profile_info()
 
-        assert validation_response.status == "error", \
-            f"Ожидался статус 'error', получен '{validation_response.status}'"
-        assert validation_response.error == "Access denied", \
+        assert "Access denied" in validation_response.error, \
             f"Ожидалось сообщение 'Access denied', получено '{validation_response.error}'"

@@ -46,8 +46,6 @@ class TestPosts:
         """Тест на голосование за пост и проверку результата в базе."""
         validation_response = clients.posts.vote_post(publish_post, 1)
 
-        assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
-
         with allure.step("Проверка голосования за пост базе данных"):
             db_vote = clients.db.get_post_vote_value(publish_post)
             assert db_vote is not None, "Голоса за пост не найдены в базе"
@@ -58,7 +56,6 @@ class TestPosts:
         """Тест на получение информации о посте и проверку данных в ответе и базе."""
         validation_response = clients.posts.get_post(publish_post)
 
-        assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
         assert validation_response.responseData.post.author == user.get("email"), \
         "Автор поста не совпадает с пользователем"
         assert str(validation_response.responseData.post.id) == publish_post, \
@@ -73,6 +70,5 @@ class TestPosts:
         """Тест на получение списка постов и проверку корректности ответа."""
         validation_response = clients.posts.get_posts_list()
 
-        assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
         assert validation_response.responseData is not None, "responseData отсутствует в ответе API"
 

@@ -24,9 +24,12 @@ class PostsController:
     @allure.step("Публикация нового поста с данными: {data}")
     def publish_post(self, data: PublishRequest) -> PostPublishResponse:
         """Публикация нового поста."""
-        response = self.api.post_request(ApiEndpoints.POST_PUBLISH, json=data.model_dump())
-        validation_response = PostPublishResponse.model_validate(response.json())
-        return validation_response
+        response = self.api.post_parse_request(
+            path=ApiEndpoints.POST_PUBLISH,
+            response_model=PostPublishResponse,
+            json=data.model_dump())
+
+        return response
 
     @allure.step("Получение информации о посте по id: {post_id} с параметрами: {params}")
     def get_post(self, post_id: str, params: Optional[Dict[str, Any]] = None) -> PostDataResponse:
@@ -43,9 +46,12 @@ class PostsController:
             params_dict = None
 
         endpoint = ApiEndpoints.POST.format(post_id=post_id)
-        response = self.api.get_request(endpoint, params=params_dict)
-        validation_response = PostDataResponse.model_validate(response.json())
-        return validation_response
+        response = self.api.get_parse_request(
+            path=endpoint,
+            response_model=PostDataResponse,
+            params=params_dict)
+
+        return response
 
     @allure.step("Добавление комментария к посту {post_id} с текстом: {comment_text}")
     def add_comment(self, post_id: str, comment_text: str) -> ApiResponse:
@@ -56,9 +62,12 @@ class PostsController:
             raise ValueError(f"post_id '{post_id}' не является валидным UUID")
         data = NewCommentRequest(text=comment_text)
         endpoint = ApiEndpoints.POST_ADD_COMMENT.format(post_id=post_id)
-        response = self.api.post_request(endpoint, json=data.model_dump())
-        validation_response = ApiResponse.model_validate(response.json())
-        return validation_response
+        response = self.api.post_parse_request(
+            path=endpoint,
+            response_model=ApiResponse,
+            json=data.model_dump())
+
+        return response
 
     @allure.step("Голосование за пост {post_id} с значением: {value}")
     def vote_post(self, post_id: str, value: Literal[-1, 1]) -> ApiResponse:
@@ -69,9 +78,12 @@ class PostsController:
             raise ValueError(f"post_id '{post_id}' не является валидным UUID")
         endpoint = ApiEndpoints.POST_VOTE.format(post_id=post_id)
         params = {"value": value}
-        response = self.api.post_request(endpoint, params=params)
-        validation_response = ApiResponse.model_validate(response.json())
-        return validation_response
+        response = self.api.post_parse_request(
+            path=endpoint,
+            response_model=ApiResponse,
+            params=params)
+
+        return response
 
     @allure.step("Получение списка постов с параметрами: {params}")
     def get_posts_list(self, params: Optional[Dict[str, Any]] = None) -> PostsResponse:
@@ -81,6 +93,9 @@ class PostsController:
             params_dict = params.model_dump()
         else:
             params_dict = None
-        response = self.api.get_request(ApiEndpoints.POSTS, params_dict)
-        validation_response = PostsResponse.model_validate(response.json())
-        return validation_response
+        response = self.api.get_parse_request(
+            path=ApiEndpoints.POSTS,
+            response_model=PostsResponse,
+            params=params_dict)
+
+        return response

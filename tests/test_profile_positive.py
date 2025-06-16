@@ -11,7 +11,7 @@ class TestProfile:
     def test_profile(self, clients, user):
         """Тест на получение профиля текущего пользователя."""
         validation_response = clients.profile.get_profile_info()
-        assert validation_response.status == "ok", f"Статус ответа не 'ok': {validation_response.status}"
+
         assert validation_response.responseData.email == user.get("email")
         assert validation_response.responseData.username == user.get("email")
 

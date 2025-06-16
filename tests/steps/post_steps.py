@@ -7,7 +7,7 @@ fake = Faker()
 def publish_post_step(clients, user):
     """Создает пост от имени авторизованного пользователя."""
     test_data = PublishRequest(title=fake.text(10), content=fake.text(25))
-    validation_response  = clients.posts.publish_post(test_data)
+    validation_response = clients.posts.publish_post(test_data)
     post_id = validation_response.responseData.id
     db_post = clients.db.get_post_by_id(str(post_id))
     assert db_post is not None, "Пост не найден в базе после создания"
