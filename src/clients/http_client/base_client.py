@@ -62,26 +62,35 @@ class BaseClient:
                 f"Ожидался статус {expected_status}, получен {response.status_code}: {response.text}")
 
     @allure.step("POST-запрос с парсингом и обработкой ошибок")
-    def post_parse_request(self, path: str, response_model: Type[T], json: Optional[Dict[str, Any]] = None,
-                       params: Optional[Dict[str, Any]] = None, expected_status: int = 200) -> T:
+    def post_parse_request(self, path: str, response_model: Optional[Type[T]] = None,
+                            json: Optional[Dict[str, Any]] = None,
+                            params: Optional[Dict[str, Any]] = None,
+                            expected_status: int = 200) -> T | Dict[str, Any]:
         try:
             response = self.post_request(path=path, json=json, params=params, expected_status=expected_status)
-            parsed_response = response_model.model_validate_json(response.text)
-            if parsed_response.status != "ok":
-                raise Exception(f"API error: {parsed_response.error}")
-            return parsed_response
+            if response_model:
+                parsed_response = response_model.model_validate_json(response.text)
+                if parsed_response.status != "ok":
+                    raise Exception(f"API error: {parsed_response.error}")
+                return parsed_response
+            else:
+                return response.json()
         except Exception as e:
             return response_model(status="error", error=str(e), responseData=None)
 
     @allure.step("GET-запрос с парсингом и обработкой ошибок")
-    def get_parse_request(self, path: str, response_model: Type[T], params: Optional[Dict[str, Any]] = None,
-                      expected_status: int = 200) -> T:
+    def get_parse_request(self, path: str, response_model: Optional[Type[T]] = None,
+                          params: Optional[Dict[str, Any]] = None,
+                          expected_status: int = 200) -> T | Dict[str, Any]:
         try:
             response = self.get_request(path, params=params, expected_status=expected_status)
-            parsed_response = response_model.model_validate_json(response.text)
-            if parsed_response.status != "ok":
-                raise Exception(f"API error: {parsed_response.error}")
-            return parsed_response
+            if response_model:
+                parsed_response = response_model.model_validate_json(response.text)
+                if parsed_response.status != "ok":
+                    raise Exception(f"API error: {parsed_response.error}")
+                return parsed_response
+            else:
+                return response.json()
         except Exception as e:
             return response_model(status="error", error=str(e), responseData=None)
 
